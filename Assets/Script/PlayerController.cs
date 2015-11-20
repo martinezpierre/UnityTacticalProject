@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour {
     bool moovng = false;
 
     List<GameObject> tiles;
+    public List<CubeScript> roadOfTiles;
 
     void Start()
     {
@@ -90,7 +91,9 @@ public class PlayerController : MonoBehaviour {
                         //transform.position = new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z);
                         canMove = false;
 
-                        StartCoroutine(move(hit.transform.position));
+                        roadOfTiles = MovementManager.Instance.findPath(transform.position, hit.transform.position);
+
+                        //StartCoroutine(move(hit.transform.position));
                     }
                 }
             }

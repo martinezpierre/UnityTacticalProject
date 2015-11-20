@@ -6,8 +6,8 @@ public class ArenaGeneration : MonoBehaviour
 {
     public GameObject floor;
     public GameObject wall;
-
     public GameObject player;
+    public List<CubeScript> listCubeScript;
 
     public int height;
     public int width;
@@ -58,8 +58,12 @@ public class ArenaGeneration : MonoBehaviour
             {
                 WallCreation(i, j);
                 GameObject currentFloor = Instantiate(floor, new Vector3(i, 0, j), Quaternion.identity) as GameObject;
+                CubeScript CS = currentFloor.GetComponent<CubeScript>();
+                CS.tile = new int[] { i,j };
+                listCubeScript.Add(CS);
                 arena[i, j] = currentFloor;
                 currentFloor.transform.parent = papaSol.transform;
+
             }
         }
 
@@ -137,7 +141,6 @@ public class ArenaGeneration : MonoBehaviour
     {
         if (x < height-1 && y < width-1 && x>=0 && y>=0)
         {
-            Debug.Log(x + " " + y);
             return arena[x, y];
         }
         else
