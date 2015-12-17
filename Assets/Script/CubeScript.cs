@@ -29,24 +29,24 @@ public class CubeScript : MonoBehaviour {
     private void getNeighbors()
     {
         GameObject go;
-        if (ArenaGeneration.Instance.getTile(tile[0]-1, tile[1]) != null)
+        if (ArenaManager.Instance.getTile(tile[0]-1, tile[1]) != null)
         {
-            go = ArenaGeneration.Instance.getTile(tile[0]-1, tile[1]);
+            go = ArenaManager.Instance.getTile(tile[0]-1, tile[1]);
             neighbor.Add (go.GetComponent<CubeScript>());
         }
-        if (ArenaGeneration.Instance.getTile(tile[0], tile[1] - 1) != null)
+        if (ArenaManager.Instance.getTile(tile[0], tile[1] - 1) != null)
         {
-            go = ArenaGeneration.Instance.getTile(tile[0], tile[1] - 1);
+            go = ArenaManager.Instance.getTile(tile[0], tile[1] - 1);
             neighbor.Add(go.GetComponent<CubeScript>());
         }
-        if (ArenaGeneration.Instance.getTile(tile[0] + 1, tile[1] ) != null)
+        if (ArenaManager.Instance.getTile(tile[0] + 1, tile[1] ) != null)
         {
-            go = ArenaGeneration.Instance.getTile(tile[0] + 1, tile[1]);
+            go = ArenaManager.Instance.getTile(tile[0] + 1, tile[1]);
             neighbor.Add(go.GetComponent<CubeScript>());
         }
-        if (ArenaGeneration.Instance.getTile(tile[0] , tile[1] + 1) != null)
+        if (ArenaManager.Instance.getTile(tile[0] , tile[1] + 1) != null)
         {
-            go = ArenaGeneration.Instance.getTile(tile[0], tile[1] + 1);
+            go = ArenaManager.Instance.getTile(tile[0], tile[1] + 1);
             neighbor.Add(go.GetComponent<CubeScript>());
         }
        

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ArenaGeneration : MonoBehaviour
+public class ArenaManager: MonoBehaviour
 {
     public GameObject floor;
     public GameObject wall;
@@ -22,9 +22,9 @@ public class ArenaGeneration : MonoBehaviour
 	private GameObject papaSol;
 	private GameObject papaMur;
 
-    static ArenaGeneration instance;
+    static ArenaManager instance;
 
-    public static ArenaGeneration Instance
+    public static ArenaManager Instance
     {
         get
         {
