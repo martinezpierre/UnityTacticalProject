@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour {
     bool moovng = false;
 
     List<GameObject> tiles;
+    public List<CubeScript> roadOfTiles;
 
     void Start()
     {
@@ -58,7 +59,7 @@ public class PlayerController : MonoBehaviour {
                     //Debug.Log(i + " " + j);
                     if (Mathf.Abs(j- (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove)
                     {
-                        GameObject go = ArenaGeneration.Instance.getTile(i, j);
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
                         if (go)
                         {
                             go.gameObject.GetComponent<Renderer>().material.color = Color.blue;
@@ -66,7 +67,7 @@ public class PlayerController : MonoBehaviour {
                         }
                     }else if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove + range)
                     {
-                        GameObject go = ArenaGeneration.Instance.getTile(i, j);
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
                         if (go)
                         {
                             go.gameObject.GetComponent<Renderer>().material.color = Color.red;
@@ -90,7 +91,9 @@ public class PlayerController : MonoBehaviour {
                         //transform.position = new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z);
                         canMove = false;
 
-                        StartCoroutine(move(hit.transform.position));
+                        roadOfTiles = MovementManager.Instance.findPath(transform.position, hit.transform.position);
+
+                        //StartCoroutine(move(hit.transform.position));
                     }
                 }
             }
@@ -103,7 +106,7 @@ public class PlayerController : MonoBehaviour {
                 {
                     if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= range)
                     {
-                        GameObject go = ArenaGeneration.Instance.getTile(i, j);
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
                         if (go)
                         {
                             go.gameObject.GetComponent<Renderer>().material.color = Color.red;
