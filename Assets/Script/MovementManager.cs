@@ -49,7 +49,7 @@ public class MovementManager : MonoBehaviour {
         float distance = 0;
         float smallDistance = 99999;
         CubeScript nearTile = null;
-        foreach (CubeScript currentTile in ArenaGeneration.Instance.listCubeScript)
+        foreach (CubeScript currentTile in ArenaGeneration.instance.listCubeScript)
         {
             distance = Vector3.Distance(tile, currentTile.getPosition());
             if (distance < smallDistance)
