@@ -24,13 +24,17 @@ public class TurnManager : MonoBehaviour {
     public List<int> playerIdList;
     public EntityController currentPlayer;
     public int currentPlayerIndex;
-    
+
+    GameObject cam;
+
     public bool gameFinished = false;
     
     public List<EntityController> entities;
 
     // Use this for initialization
     void Start () {
+        cam = Camera.main.gameObject;
+
         entities = new List<EntityController>();
 
         EntityController[] entitabs = FindObjectsOfType<EntityController>();
@@ -47,11 +51,24 @@ public class TurnManager : MonoBehaviour {
 
         currentPlayerIndex = 0;
         currentPlayer = entities[currentPlayerIndex];
+        SetCamera();
     }
     
+    public void Remove(EntityController eC)
+    {
+        entities.Remove(eC);
+    }
+
     public void Endturn()
     {
         StartCoroutine(EndTurnActions());
+    }
+
+    void SetCamera()
+    {
+        cam.transform.parent = currentPlayer.transform;
+        cam.transform.localPosition = new Vector3(0f, cam.transform.localPosition.y, 0f);
+        currentPlayer.BeginTurn();
     }
 
     IEnumerator EndTurnActions()
@@ -62,6 +79,7 @@ public class TurnManager : MonoBehaviour {
             currentPlayerIndex = (currentPlayerIndex + 1) % entities.Count;
 
             currentPlayer = entities[currentPlayerIndex];
+            SetCamera();
 
             if (currentPlayerIndex == 0)
             {
