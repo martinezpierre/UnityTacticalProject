@@ -63,11 +63,11 @@ public class MovementManager : MonoBehaviour {
     public List<CubeScript> findPathFromTile(CubeScript start, CubeScript end)
     {
         List<CubeScript> road = foundRoad(start, end);
-        List<CubeScript> r = new List<CubeScript>(road.Count);
+        /*List<CubeScript> r = new List<CubeScript>(road.Count);
         foreach (CubeScript node in road)
         {
-            //r.Add(node.getPosition());
-        }
+            r.Add(node.getPosition());
+        }*/
         return road;
     }
 
@@ -118,7 +118,7 @@ public class MovementManager : MonoBehaviour {
 
         if (currentTile == tileEnd)
         {
-            return returnRoad(currentTile);
+            return returnRoad(currentTile, checkedTile);
         }
         else
         {
@@ -126,7 +126,7 @@ public class MovementManager : MonoBehaviour {
         }
 
     }
-    public List<CubeScript> returnRoad(CubeScript currentTile)
+    public List<CubeScript> returnRoad(CubeScript currentTile,  List<CubeScript> checkedTile)
     {
         List<CubeScript> onTheRoad = new List<CubeScript>();
         while (currentTile.previousTile != null)
@@ -134,7 +134,21 @@ public class MovementManager : MonoBehaviour {
             onTheRoad.Insert(0, currentTile);
             currentTile = currentTile.previousTile;
         }
+        ResetTile(checkedTile);
+        Debug.Log(onTheRoad.Count);
         return onTheRoad;
+    }
+
+
+    void ResetTile(List<CubeScript> checkedTile)
+    {
+        foreach(CubeScript CS in checkedTile)
+        {
+            CS.distance = 9999;
+            CS.heurystic = 9999;
+            CS.previousTile = null;
+            CS.cumule = 0;
+        }
     }
 
 }
