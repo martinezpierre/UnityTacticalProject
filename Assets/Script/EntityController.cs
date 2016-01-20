@@ -26,6 +26,21 @@ public class EntityController : MonoBehaviour {
 	
 	}
     
+    public virtual void BeginTurn()
+    {
+        Debug.Log("begin entity");
+    }
+
+    public virtual void TakeDamage()
+    {
+
+    }
+
+    void OnDestroy()
+    {
+        TurnManager.Instance.Remove(this);
+    }
+
     public void EndTurn()
     {
         Debug.Log("end turn");

@@ -14,7 +14,12 @@ public class EnemyController : EntityController {
 	
 	}
 
-    public void TakeDamage()
+    public override void BeginTurn()
+    {
+        Debug.Log("begin enemy");
+    }
+
+    public override void TakeDamage()
     {
         Destroy(gameObject);
     }

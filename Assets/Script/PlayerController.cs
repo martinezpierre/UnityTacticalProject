@@ -22,11 +22,11 @@ public class PlayerController : EntityController
         {
             actualPosition = new Vector2(hit.transform.position.x, hit.transform.position.z);
         }
-        recolor();
     }
 
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update()
+    {
 
         if (!TurnManager.Instance.canPlay(id)) return;
 
@@ -47,7 +47,6 @@ public class PlayerController : EntityController
         }
         else if (canMove && Input.GetMouseButtonDown(0))
         {
-            Debug.Log("je clic");
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray.origin, ray.direction, out hit))
@@ -55,52 +54,53 @@ public class PlayerController : EntityController
                 if (hit.transform.tag == "Tile" && hit.transform.gameObject.GetComponent<Renderer>().material.color == Color.blue)
                 {
                     {
-                        Debug.Log(hit.transform.position.x + " " + hit.transform.position.z);
                         hit.transform.gameObject.GetComponent<Renderer>().material.color = Color.yellow;
                         //transform.Translate(new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z));
                         //transform.position = new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z);
                         canMove = false;
-                        Debug.Log("je peux bouger !");
                         roadOfTiles = MovementManager.Instance.findPath(transform.position, hit.transform.position);
 
-                        Debug.Log("ça marche encore?");
                         if (roadOfTiles.Count > 0)
                             StartCoroutine(move(roadOfTiles));
                     }
                 }
 
             }
-            if (canAttack && !moovng)
+        }
+
+        if (canAttack && !moovng && !canMove)
+        {
+
+            for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
             {
-                for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
+                for (int j = (int)actualPosition.y - range; j <= (int)actualPosition.y + range; j++)
                 {
-                    for (int j = (int)actualPosition.y - range; j <= (int)actualPosition.y + range; j++)
+                    if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= range)
                     {
-                        if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= range)
+                        GameObject go = ArenaManager.Instance.getTile(i, j); if (go)
                         {
-                            GameObject go = ArenaManager.Instance.getTile(i, j); if (go)
-                            {
-                                go.gameObject.GetComponent<Renderer>().material.color = Color.red;
-                                tiles.Add(go);
-                            }
+                            go.gameObject.GetComponent<Renderer>().material.color = Color.red;
+                            tiles.Add(go);
                         }
                     }
                 }
-                if (Input.GetMouseButton(0))
+            }
+            if (Input.GetMouseButton(0))
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray.origin, ray.direction, out hit) && (hit.transform.tag == "Enemy" || hit.transform.tag == "Player"))
                 {
-                    ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    Vector3 behind = -hit.transform.TransformDirection(Vector3.up);
 
-                    if (Physics.Raycast(ray.origin, ray.direction, out hit) && hit.transform.tag == "Enemy")
+                    RaycastHit rhit;
+
+                    if (Physics.Raycast(transform.position, behind, out rhit) && rhit.transform.gameObject.GetComponent<Renderer>().material.color == Color.red)
                     {
-                        Vector3 behind = -hit.transform.TransformDirection(Vector3.up);
-
-                        RaycastHit rhit;
-
-                        if (Physics.Raycast(transform.position, behind, out rhit) && rhit.transform.gameObject.GetComponent<Renderer>().material.color == Color.red)
-                        {
-                            Debug.Log("attack enemy at position " + hit.transform.position);
-                            hit.transform.gameObject.GetComponent<EnemyController>().TakeDamage();
-                        }
+                        Debug.Log("attack enemy at position " + hit.transform.position);
+                        hit.transform.gameObject.GetComponent<EntityController>().TakeDamage();
+                        EndTurn();
                     }
                 }
             }
@@ -109,11 +109,11 @@ public class PlayerController : EntityController
 
     void recolor()
     {
+        Debug.Log(actualPosition);
         for (int i = (int)actualPosition.x - maxMove - range; i <= (int)actualPosition.x + maxMove + range; i++)
         {
             for (int j = (int)actualPosition.y - maxMove - range; j <= (int)actualPosition.y + maxMove + range; j++)
             {
-                //Debug.Log(i + " " + j);
                 if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove)
                 {
                     GameObject go = ArenaManager.Instance.getTile(i, j);
@@ -153,7 +153,6 @@ public class PlayerController : EntityController
 
         while (Vector3.Distance(transform.position, lastTarget) > 0.1f)
         {
-            Debug.Log("je bouge");
             Vector3 nextTarget = target[0].getPosition();
             if (Vector3.Distance(transform.position, nextTarget) > 0.1f)
             {
@@ -168,10 +167,21 @@ public class PlayerController : EntityController
             }
         }
 
-        actualPosition = new Vector2(lastTarget.x, lastTarget.y);
+        actualPosition = new Vector2(lastTarget.x, lastTarget.z);
         repaint(tiles);
         roadOfTiles.Clear();
         moovng = false;
+    }
+
+    public override void BeginTurn()
+    {
+        Debug.Log("begin player");
+        recolor();
+    }
+
+    public override void TakeDamage()
+    {
+        Destroy(gameObject);
     }
 
 }

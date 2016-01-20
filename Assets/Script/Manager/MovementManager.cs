@@ -67,8 +67,7 @@ public class MovementManager : MonoBehaviour {
         {
             r.Add(node.getPosition());
         }*/
-
-        Debug.Log(road.Count());
+        
         return road;
     }
 
@@ -136,7 +135,6 @@ public class MovementManager : MonoBehaviour {
             currentTile = currentTile.previousTile;
         }
         ResetTile(checkedTile);
-        Debug.Log(onTheRoad.Count);
         return onTheRoad;
     }
 
