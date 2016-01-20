@@ -1,24 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyController : MonoBehaviour {
-
-    bool canMove = true;
-    bool canAttack = true;
-
-    Vector2 actualPosition;
-
-    public int maxMove = 3;
-    public int range = 1;
-
-    public float speed = 1f;
-
-    bool moovng = false;
-
+public class EnemyController : EntityController {
+    
     // Use this for initialization
     void Start () {
-	
-	}
+        canMove = true;
+        canAttack = true;
+    }
 	
 	// Update is called once per frame
 	void Update () {

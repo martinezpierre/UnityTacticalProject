@@ -2,25 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerController : MonoBehaviour {
-
-    bool canMove = true;
-    bool canAttack = true;
-
-    Vector2 actualPosition;
-
-    public int maxMove = 3;
-    public int range = 1;
-
-    public float speed = 1f;
-
-    bool moovng = false;
-
+public class PlayerController : EntityController
+{
     List<GameObject> tiles;
     public List<CubeScript> roadOfTiles;
 
     void Start()
     {
+        canMove = true;
+        canAttack = true;
+
         tiles = new List<GameObject>();
 
         Vector3 behind = -transform.TransformDirection(Vector3.up);
@@ -35,19 +26,22 @@ public class PlayerController : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+
+        if (!TurnManager.Instance.canPlay(id)) return;
+
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            if(canMove == true)
+
+            Debug.Log("turn of player  " + id);
+
+            repaint(tiles);
+            if (canMove == true)
             {
-                repaint(tiles);
                 canMove = false;
             }
             else
             {
-                Debug.Log("end of turn");
-                canMove = true;
-                canAttack = true;
-
+                EndTurn();
             }
         }
         else if (canMove)
@@ -160,4 +154,5 @@ public class PlayerController : MonoBehaviour {
 
         moovng = false;
     }
+
 }

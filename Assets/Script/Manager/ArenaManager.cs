@@ -32,15 +32,17 @@ public class ArenaManager: MonoBehaviour
         }
     }
 
-    void Awake()
+    /*void Awake()
     {
         instance = this;
-    }
+    }*/
 
     // Use this for initialization
-    void Start ()
+    void Awake ()
     {
-		GameObject GrandPa = new GameObject();
+        instance = this;
+
+        GameObject GrandPa = new GameObject();
 		GrandPa.name = "GrandPa";
 		papaSol = new GameObject();
 		papaSol.name = "PapaSol";
@@ -71,6 +73,11 @@ public class ArenaManager: MonoBehaviour
         Camera.main.transform.parent = go.transform;
         Camera.main.transform.localPosition = new Vector3(0, 10, 0);
 
+        GameObject go2 = Instantiate(player, new Vector3(width-1, player.transform.localScale.y / 2, 0), Quaternion.identity) as GameObject;
+
+        GameObject go3 = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, height-1), Quaternion.identity) as GameObject;
+
+        GameObject go4 = Instantiate(player, new Vector3(width - 1, player.transform.localScale.y / 2, height - 1), Quaternion.identity) as GameObject;
     }
 
     void WallCreation(int a, int b)
@@ -95,8 +102,6 @@ public class ArenaManager: MonoBehaviour
             GameObject currentWallContour = Instantiate(wall, new Vector3(a, wallHeight, b + floorSide), Quaternion.identity) as GameObject;
 			currentWallContour.transform.parent = papaMur.transform;
         }
-		
-		
 		
         randomSpawnWall = Random.Range(0, 100);
         if(randomSpawnWall < chanceSpawnWall)
@@ -139,7 +144,7 @@ public class ArenaManager: MonoBehaviour
 
     public GameObject getTile(int x, int y)
     {
-        if (x < height-1 && y < width-1 && x>=0 && y>=0)
+        if (x < height && y < width  && x>=0 && y>=0)
         {
             return arena[x, y];
         }
