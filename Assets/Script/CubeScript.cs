@@ -12,13 +12,13 @@ public class CubeScript : MonoBehaviour {
     public float heurystic = 9999;
     public CubeScript previousTile = null;
     public float cumule = 0;
-    public List<CubeScript> neighbor;
+    public List<CubeScript> neighbor = new List<CubeScript>();
     public int[] tile;
 
     // Use this for initialization
     void Start () {
         position = transform.position + (Vector3.up / 2);
-        Invoke("getNeighbors", 1);
+        //Invoke("getNeighbors", 1);
 	}
 	
 	// Update is called once per frame
@@ -26,31 +26,31 @@ public class CubeScript : MonoBehaviour {
 	
 	}
 
-    private void getNeighbors()
+    /*private void getNeighbors()
     {
         GameObject go;
         if (ArenaManager.Instance.getTile(tile[0]-1, tile[1]) != null)
         {
             go = ArenaManager.Instance.getTile(tile[0]-1, tile[1]);
-            neighbor.Add (go.GetComponent<CubeScript>());
+            neighbor[2] = (go.GetComponent<CubeScript>());
         }
         if (ArenaManager.Instance.getTile(tile[0], tile[1] - 1) != null)
         {
             go = ArenaManager.Instance.getTile(tile[0], tile[1] - 1);
-            neighbor.Add(go.GetComponent<CubeScript>());
+            neighbor[3] = (go.GetComponent<CubeScript>());
         }
         if (ArenaManager.Instance.getTile(tile[0] + 1, tile[1] ) != null)
         {
             go = ArenaManager.Instance.getTile(tile[0] + 1, tile[1]);
-            neighbor.Add(go.GetComponent<CubeScript>());
+            neighbor[1] = (go.GetComponent<CubeScript>());
         }
         if (ArenaManager.Instance.getTile(tile[0] , tile[1] + 1) != null)
         {
             go = ArenaManager.Instance.getTile(tile[0], tile[1] + 1);
-            neighbor.Add(go.GetComponent<CubeScript>());
+            neighbor[0] = (go.GetComponent<CubeScript>());
         }
        
-    }
+    }*/
     public Vector3 getPosition()
     {
         return position;

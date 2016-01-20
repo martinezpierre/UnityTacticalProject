@@ -32,14 +32,6 @@ public class ArenaManager: MonoBehaviour
             return instance;
         }
     }
-
-    /*void Awake()
->>>>>>> 43358d701ba7c5fbb1e82a3848f3e9f4c2052ebd
-    {
-        instance = this;
-    }*/
-
-    // Use this for initialization
     void Awake ()
     {
         end = false;
@@ -89,6 +81,10 @@ public class ArenaManager: MonoBehaviour
             }
         }
 
+        //Check voisins
+        CheckNeighboors();
+
+
         while(end == false)
         {
             Colorate();
@@ -112,6 +108,35 @@ public class ArenaManager: MonoBehaviour
         GameObject go3 = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, height-1), Quaternion.identity) as GameObject;
 
         GameObject go4 = Instantiate(player, new Vector3(width - 1, player.transform.localScale.y / 2, height - 1), Quaternion.identity) as GameObject;
+    }
+
+    void CheckNeighboors()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                CubeScript cs = arena[i, j].GetComponent<CubeScript>();
+                if (getTile(i, j+1) != null)
+                {
+                    if (wallArena[i, j][0] == 0) cs.neighbor.Add(arena[i, j + 1].GetComponent<CubeScript>());
+                }
+                if (getTile(i+1, j) != null)
+                {
+                    if (wallArena[i, j][1] == 0) cs.neighbor.Add(arena[i+1,j].GetComponent<CubeScript>());
+                }
+                if (getTile(i - 1, j) != null)
+                {
+                    if (wallArena[i, j][2] == 0) cs.neighbor.Add(arena[i-1,j].GetComponent<CubeScript>());
+                }
+                if (getTile(i,j- 1) != null)
+                {
+                    if (wallArena[i, j][3] == 0) cs.neighbor.Add(arena[i,j-1].GetComponent<CubeScript>());
+                }
+
+
+            }
+        }
     }
 
     // Cette méthode permet de créer les murs autour et dans l'arène

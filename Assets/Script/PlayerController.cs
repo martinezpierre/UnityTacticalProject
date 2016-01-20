@@ -168,7 +168,7 @@ public class PlayerController : EntityController
             }
         }
 
-        actualPosition = new Vector2(lastTarget.x, lastTarget.y);
+        actualPosition = new Vector2(lastTarget.x, lastTarget.z);
         repaint(tiles);
         roadOfTiles.Clear();
         moovng = false;
