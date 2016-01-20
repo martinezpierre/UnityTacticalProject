@@ -67,6 +67,8 @@ public class MovementManager : MonoBehaviour {
         {
             r.Add(node.getPosition());
         }*/
+
+        Debug.Log(road.Count());
         return road;
     }
 

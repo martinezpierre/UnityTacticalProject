@@ -14,7 +14,7 @@ public class ArenaManager: MonoBehaviour
     public int chanceSpawnWall;
     
     private GameObject[,] arena;
-    private GameObject[,] wallArena;;
+    private int[,][] wallArena;
     private GameObject[,][] wallObject;
     private float wallHeight;
     private float floorSide;
@@ -25,15 +25,16 @@ public class ArenaManager: MonoBehaviour
     private bool end;
 
     static ArenaManager instance;
-    public static ArenaManager Instance    {
-        if(ArenaManager.instance == null)
+    public static ArenaManager Instance
+    {
+        get
         {
-            instance = this;
+            return instance;
         }
-        else if(ArenaManager.instance != this)
-        {
-            Destroy(this.gameObject);
-        }
+    }
+    void Awake()
+    {
+        instance = this;
     }
 
     // Use this for initialization
@@ -51,7 +52,7 @@ public class ArenaManager: MonoBehaviour
         wallHeight = wall.transform.localScale.y / 2;
         floorSide = floor.transform.localScale.x / 2;
         arena = new GameObject[height, width];
-        wallArena = new GameObject[height, width];
+        wallArena = new int[height, width][];
         wallObject = new GameObject[height, width][];
         for (int i = 0; i < height; i++)
         {
