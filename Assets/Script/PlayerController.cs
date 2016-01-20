@@ -2,25 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerController : MonoBehaviour {
-
-    bool canMove = true;
-    bool canAttack = true;
-
-    Vector2 actualPosition;
-
-    public int maxMove = 3;
-    public int range = 1;
-
-    public float speed = 1f;
-    bool deguelass = true;
-    bool moovng = false;
-
+public class PlayerController : EntityController
+{
     List<GameObject> tiles;
     public List<CubeScript> roadOfTiles;
 
     void Start()
     {
+        canMove = true;
+        canAttack = true;
+
         tiles = new List<GameObject>();
 
         Vector3 behind = -transform.TransformDirection(Vector3.up);
@@ -35,25 +26,23 @@ public class PlayerController : MonoBehaviour {
     }
 
 	// Update is called once per frame
-    void Update()
-    {
-        Debug.Log("j'update");
+	void Update () {
+
+        if (!TurnManager.Instance.canPlay(id)) return;
 
         if (Input.GetKeyDown(KeyCode.Return))
         {
+
+            Debug.Log("turn of player  " + id);
+
+            repaint(tiles);
             if (canMove == true)
             {
-                Debug.Log("coucou");
-                repaint(tiles);
                 canMove = false;
             }
             else
             {
-                Debug.Log("end of turn");
-                recolor();
-                canMove = true;
-                canAttack = true;
-
+                EndTurn();
             }
         }
         else if (canMove && Input.GetMouseButtonDown(0))
@@ -75,7 +64,6 @@ public class PlayerController : MonoBehaviour {
                         roadOfTiles = MovementManager.Instance.findPath(transform.position, hit.transform.position);
 
                         Debug.Log("ça marche encore?");
-                        deguelass = false;
                         if (roadOfTiles.Count > 0)
                             StartCoroutine(move(roadOfTiles));
                     }
@@ -185,4 +173,5 @@ public class PlayerController : MonoBehaviour {
         roadOfTiles.Clear();
         moovng = false;
     }
+
 }

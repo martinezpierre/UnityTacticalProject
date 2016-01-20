@@ -32,16 +32,20 @@ public class ArenaManager: MonoBehaviour
             return instance;
         }
     }
-    void Awake()
+
+    /*void Awake()
+>>>>>>> 43358d701ba7c5fbb1e82a3848f3e9f4c2052ebd
     {
         instance = this;
-    }
+    }*/
 
     // Use this for initialization
-    void Start ()
+    void Awake ()
     {
         end = false;
 		GameObject GrandPa = new GameObject();
+        instance = this;
+
 		GrandPa.name = "GrandPa";
 		papaSol = new GameObject();
 		papaSol.name = "PapaSol";
@@ -103,6 +107,11 @@ public class ArenaManager: MonoBehaviour
         GameObject go = Instantiate(player, new Vector3(0,player.transform.localScale.y/2,0), Quaternion.identity) as GameObject;
         Camera.main.transform.parent = go.transform;
         Camera.main.transform.localPosition = new Vector3(0, 10, 0);
+        GameObject go2 = Instantiate(player, new Vector3(width-1, player.transform.localScale.y / 2, 0), Quaternion.identity) as GameObject;
+
+        GameObject go3 = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, height-1), Quaternion.identity) as GameObject;
+
+        GameObject go4 = Instantiate(player, new Vector3(width - 1, player.transform.localScale.y / 2, height - 1), Quaternion.identity) as GameObject;
     }
 
     // Cette méthode permet de créer les murs autour et dans l'arène
@@ -138,8 +147,6 @@ public class ArenaManager: MonoBehaviour
 			currentWallContour.transform.parent = papaMur.transform;
         }
 		
-		
-		// Création des murs au milieu de l'arène
         randomSpawnWall = Random.Range(0, 100);
         if(randomSpawnWall < chanceSpawnWall)
         {
@@ -433,7 +440,7 @@ public class ArenaManager: MonoBehaviour
     // Ce n'est pas moi qui ait écrit cette fonction, du moins je ne me souviens pas
     public GameObject getTile(int x, int y)
     {
-        if (x < height-1 && y < width-1 && x>=0 && y>=0)
+        if (x < height && y < width  && x>=0 && y>=0)
         {
             return arena[x, y];
         }

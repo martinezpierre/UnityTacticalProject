@@ -3,8 +3,22 @@ using System.Collections;
 
 public class PlayerManager : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+    public static PlayerManager instance = null;
+    public static PlayerManager Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
+
+    void Awake()
+    {
+        instance = this;
+    }
+
+    // Use this for initialization
+    void Start () {
 	
 	}
 	
