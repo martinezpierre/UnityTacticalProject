@@ -64,7 +64,39 @@ public class PlayerController : MonoBehaviour {
             {
                 if (hit.transform.tag == "Tile" && hit.transform.gameObject.GetComponent<Renderer>().material.color == Color.blue)
                 {
-                    {                        Debug.Log(hit.transform.position.x + " " + hit.transform.position.z);
+<<<<<<< HEAD
+                    //Debug.Log(i + " " + j);
+                    if (Mathf.Abs(j- (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove)
+                    {
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
+                        if (go)
+                        {
+                            go.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+                            tiles.Add(go);
+                        }
+                    }else if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove + range)
+                    {
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
+                        if (go)
+                        {
+                            go.gameObject.GetComponent<Renderer>().material.color = Color.red;
+                            tiles.Add(go);
+                        }
+                    }
+                }
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray.origin, ray.direction, out hit))
+                {
+                    if (hit.transform.tag == "Tile" && hit.transform.gameObject.GetComponent<Renderer>().material.color == Color.blue)
+                    {
+=======
+>>>>>>> Valentin
+                        Debug.Log(hit.transform.position.x + " " + hit.transform.position.z);
                         hit.transform.gameObject.GetComponent<Renderer>().material.color = Color.yellow;
                         //transform.Translate(new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z));
                         //transform.position = new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z);
@@ -88,7 +120,12 @@ public class PlayerController : MonoBehaviour {
                 {
                     if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= range)
                     {
-                        GameObject go = ArenaGeneration.Instance.getTile(i, j);                        if (go)
+<<<<<<< HEAD
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
+=======
+                        GameObject go = ArenaManager.Instance.getTile(i, j);
+>>>>>>> Valentin
+                        if (go)
                         {
                             go.gameObject.GetComponent<Renderer>().material.color = Color.red;
                             tiles.Add(go);

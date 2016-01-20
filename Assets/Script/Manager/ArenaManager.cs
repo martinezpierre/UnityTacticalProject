@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ArenaGeneration : MonoBehaviour
+public class ArenaManager: MonoBehaviour
 {
     public GameObject floor;
     public GameObject wall;
@@ -14,7 +14,7 @@ public class ArenaGeneration : MonoBehaviour
     public int chanceSpawnWall;
     
     private GameObject[,] arena;
-    private int[,][] wallArena;
+    private GameObject[,] wallArena;;
     private GameObject[,][] wallObject;
     private float wallHeight;
     private float floorSide;
@@ -24,15 +24,13 @@ public class ArenaGeneration : MonoBehaviour
 	private GameObject papaMur;
     private bool end;
 
-    public static ArenaGeneration instance = null;
-
-    void Awake()
-    {
-        if(ArenaGeneration.instance == null)
+    static ArenaManager instance;
+    public static ArenaManager Instance    {
+        if(ArenaManager.instance == null)
         {
             instance = this;
         }
-        else if(ArenaGeneration.instance != this)
+        else if(ArenaManager.instance != this)
         {
             Destroy(this.gameObject);
         }
@@ -53,7 +51,7 @@ public class ArenaGeneration : MonoBehaviour
         wallHeight = wall.transform.localScale.y / 2;
         floorSide = floor.transform.localScale.x / 2;
         arena = new GameObject[height, width];
-        wallArena = new int[height, width][];
+        wallArena = new GameObject[height, width];
         wallObject = new GameObject[height, width][];
         for (int i = 0; i < height; i++)
         {

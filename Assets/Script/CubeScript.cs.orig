@@ -29,6 +29,26 @@ public class CubeScript : MonoBehaviour {
     private void getNeighbors()
     {
         GameObject go;
+<<<<<<< HEAD
+        if (ArenaGeneration.instance.getTile(tile[0]-1, tile[1]) != null)
+        {
+            go = ArenaGeneration.instance.getTile(tile[0]-1, tile[1]);
+            neighbor.Add (go.GetComponent<CubeScript>());
+        }
+        if (ArenaGeneration.instance.getTile(tile[0], tile[1] - 1) != null)
+        {
+            go = ArenaGeneration.instance.getTile(tile[0], tile[1] - 1);
+            neighbor.Add(go.GetComponent<CubeScript>());
+        }
+        if (ArenaGeneration.instance.getTile(tile[0] + 1, tile[1] ) != null)
+        {
+            go = ArenaGeneration.instance.getTile(tile[0] + 1, tile[1]);
+            neighbor.Add(go.GetComponent<CubeScript>());
+        }
+        if (ArenaGeneration.instance.getTile(tile[0] , tile[1] + 1) != null)
+        {
+            go = ArenaGeneration.instance.getTile(tile[0], tile[1] + 1);
+=======
         if (ArenaManager.Instance.getTile(tile[0]-1, tile[1]) != null)
         {
             go = ArenaManager.Instance.getTile(tile[0]-1, tile[1]);
@@ -47,6 +67,7 @@ public class CubeScript : MonoBehaviour {
         if (ArenaManager.Instance.getTile(tile[0] , tile[1] + 1) != null)
         {
             go = ArenaManager.Instance.getTile(tile[0], tile[1] + 1);
+>>>>>>> Valentin
             neighbor.Add(go.GetComponent<CubeScript>());
         }
        
