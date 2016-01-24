@@ -108,6 +108,18 @@ public class ArenaManager: MonoBehaviour
         GameObject go3 = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, height-1), Quaternion.identity) as GameObject;
 
         GameObject go4 = Instantiate(player, new Vector3(width - 1, player.transform.localScale.y / 2, height - 1), Quaternion.identity) as GameObject;
+
+        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
+        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TWOATTACKS);
+        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+
+        go2.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
+
+        go3.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TWOATTACKS);
+        go3.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+
+        go4.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
+        go4.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
     }
 
     void CheckNeighboors()

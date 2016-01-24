@@ -59,6 +59,11 @@ public class TurnManager : MonoBehaviour {
         entities.Remove(eC);
     }
 
+    public void SkipAction()
+    {
+        currentPlayer.SkipAction();
+    }
+
     public void Endturn()
     {
         StartCoroutine(EndTurnActions());

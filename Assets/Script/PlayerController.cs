@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 public class PlayerController : EntityController
 {
-    List<GameObject> tiles;
     public List<CubeScript> roadOfTiles;
+
+    bool dropdownCreated = false;
 
     void Start()
     {
@@ -29,23 +30,29 @@ public class PlayerController : EntityController
     {
 
         if (!TurnManager.Instance.canPlay(id)) return;
+        
+        MoveAction();
+        AttackAction();
 
-        if (Input.GetKeyDown(KeyCode.Return))
+    }
+
+    public override void SkipAction()
+    {
+        repaint(tiles);
+        if (canMove == true)
         {
-
-            Debug.Log("turn of player  " + id);
-
-            repaint(tiles);
-            if (canMove == true)
-            {
-                canMove = false;
-            }
-            else
-            {
-                EndTurn();
-            }
+            canMove = false;
         }
-        else if (canMove && Input.GetMouseButtonDown(0))
+        else
+        {
+            dropdownCreated = false;
+            EndTurn();
+        }
+    }
+
+    void MoveAction()
+    {
+        if (canMove && Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -67,11 +74,17 @@ public class PlayerController : EntityController
 
             }
         }
+    }
 
-        if (canAttack && !moovng && !canMove)
+    void AttackAction()
+    {
+        if (canAttack && !moovng && !canMove && !dropdownCreated)
         {
 
-            for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
+            SpellManager.Instance.CreateDropDown(this);
+            dropdownCreated = true;
+
+            /*for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
             {
                 for (int j = (int)actualPosition.y - range; j <= (int)actualPosition.y + range; j++)
                 {
@@ -103,7 +116,7 @@ public class PlayerController : EntityController
                         EndTurn();
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -137,7 +150,7 @@ public class PlayerController : EntityController
         Debug.Log("recolor");
     }
 
-    void repaint(List<GameObject> tiles)
+    public void repaint(List<GameObject> tiles)
     {
         foreach (GameObject tile in tiles)
         {
@@ -182,6 +195,11 @@ public class PlayerController : EntityController
     public override void TakeDamage()
     {
         Destroy(gameObject);
+    }
+
+    public override void ChooseSpell()
+    {
+        
     }
 
 }

@@ -1,8 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EntityController : MonoBehaviour {
-    
+
+
+    public List<GameObject> tiles;
+
     public bool canMove;
     public bool canAttack;
     
@@ -16,6 +20,8 @@ public class EntityController : MonoBehaviour {
     public bool moovng = false;
 
     public int id;
+
+    public List<SpellManager.SPELL> spells;
 
     // Use this for initialization
     void Start () {
@@ -31,10 +37,7 @@ public class EntityController : MonoBehaviour {
         Debug.Log("begin entity");
     }
 
-    public virtual void TakeDamage()
-    {
-
-    }
+    public virtual void TakeDamage(){}
 
     void OnDestroy()
     {
@@ -47,6 +50,21 @@ public class EntityController : MonoBehaviour {
 
         canMove = true;
         canAttack = true;
+
         TurnManager.Instance.Endturn();
+    }
+
+    public virtual void SkipAction() { }
+
+    public virtual void ChooseSpell(){}
+
+    public void AddSpell(SpellManager.SPELL spell)
+    {
+        spells.Add(spell);
+    }
+
+    public void RemoveSpell(SpellManager.SPELL spell)
+    {
+        spells.Remove(spell);
     }
 }
