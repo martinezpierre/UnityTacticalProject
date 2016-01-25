@@ -12,9 +12,10 @@ public class ArenaManager: MonoBehaviour
     public int height;
     public int width;
     public int chanceSpawnWall;
-    
-    private GameObject[,] arena;
-    private int[,][] wallArena;
+
+    public GameObject[,] arena;
+    public int[,][] wallArena;
+
     private GameObject[,][] wallObject;
     private float wallHeight;
     private float floorSide;
