@@ -2,17 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerController : EntityController
-{
-    public List<CubeScript> roadOfTiles;
+public class PlayerController : MonoBehaviour {
 
-    bool dropdownCreated = false;
+    bool canMove = true;
+    bool canAttack = true;
+
+    Vector2 actualPosition;
+
+    public int maxMove = 3;
+    public int range = 1;
+
+    public float speed = 1f;
+    bool deguelass = true;
+    bool moovng = false;
+
+    List<GameObject> tiles;
+    public List<CubeScript> roadOfTiles;
 
     void Start()
     {
-        canMove = true;
-        canAttack = true;
-
         tiles = new List<GameObject>();
 
         Vector3 behind = -transform.TransformDirection(Vector3.up);
@@ -23,74 +31,101 @@ public class PlayerController : EntityController
         {
             actualPosition = new Vector2(hit.transform.position.x, hit.transform.position.z);
         }
+        recolor();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+	// Update is called once per frame
+	void Update () {
+        Debug.Log("j'update");
 
-        if (!TurnManager.Instance.canPlay(id)) return;
-        
-        MoveAction();
-        AttackAction();
-
-    }
-
-    public override void SkipAction()
-    {
-        repaint(tiles);
-        if (canMove == true)
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            canMove = false;
+            if(canMove == true)
+            {
+                Debug.Log("coucou");
+                repaint(tiles);
+                canMove = false;
+            }
+            else
+            {
+                Debug.Log("end of turn");
+                recolor();
+                canMove = true;
+                canAttack = true;
+
+            }
         }
-        else
+        else if (canMove && Input.GetMouseButtonDown(0))
         {
-            dropdownCreated = false;
-            EndTurn();
-        }
-    }
-
-    void MoveAction()
-    {
-        if (canMove && Input.GetMouseButtonDown(0))
-        {
+            Debug.Log("je clic");
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray.origin, ray.direction, out hit))
+            if (Physics.Raycast(ray.origin, ray.direction,out hit))
             {
                 if (hit.transform.tag == "Tile" && hit.transform.gameObject.GetComponent<Renderer>().material.color == Color.blue)
                 {
+<<<<<<< HEAD
+                    //Debug.Log(i + " " + j);
+                    if (Mathf.Abs(j- (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove)
                     {
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
+                        if (go)
+                        {
+                            go.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+                            tiles.Add(go);
+                        }
+                    }else if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove + range)
+                    {
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
+                        if (go)
+                        {
+                            go.gameObject.GetComponent<Renderer>().material.color = Color.red;
+                            tiles.Add(go);
+                        }
+                    }
+                }
+            }
+
+            if (Input.GetMouseButton(0))
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray.origin, ray.direction, out hit))
+                {
+                    if (hit.transform.tag == "Tile" && hit.transform.gameObject.GetComponent<Renderer>().material.color == Color.blue)
+                    {
+=======
+>>>>>>> Valentin
+                        Debug.Log(hit.transform.position.x + " " + hit.transform.position.z);
                         hit.transform.gameObject.GetComponent<Renderer>().material.color = Color.yellow;
                         //transform.Translate(new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z));
                         //transform.position = new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z);
                         canMove = false;
+                        Debug.Log("je peux bouger !");
                         roadOfTiles = MovementManager.Instance.findPath(transform.position, hit.transform.position);
 
+                        Debug.Log("ça marche encore?");
+                        deguelass = false;
                         if (roadOfTiles.Count > 0)
                             StartCoroutine(move(roadOfTiles));
-                    }
                 }
-
             }
+            
         }
-    }
-
-    void AttackAction()
-    {
-        if (canAttack && !moovng && !canMove && !dropdownCreated)
+        if (canAttack && !moovng)
         {
-
-            SpellManager.Instance.CreateDropDown(this);
-            dropdownCreated = true;
-
-            /*for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
+            for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
             {
                 for (int j = (int)actualPosition.y - range; j <= (int)actualPosition.y + range; j++)
                 {
                     if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= range)
                     {
-                        GameObject go = ArenaManager.Instance.getTile(i, j); if (go)
+<<<<<<< HEAD
+                        GameObject go = ArenaGeneration.instance.getTile(i, j);
+=======
+                        GameObject go = ArenaManager.Instance.getTile(i, j);
+>>>>>>> Valentin
+                        if (go)
                         {
                             go.gameObject.GetComponent<Renderer>().material.color = Color.red;
                             tiles.Add(go);
@@ -103,7 +138,7 @@ public class PlayerController : EntityController
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-                if (Physics.Raycast(ray.origin, ray.direction, out hit) && (hit.transform.tag == "Enemy" || hit.transform.tag == "Player"))
+                if (Physics.Raycast(ray.origin, ray.direction, out hit) && hit.transform.tag == "Enemy")
                 {
                     Vector3 behind = -hit.transform.TransformDirection(Vector3.up);
 
@@ -112,21 +147,20 @@ public class PlayerController : EntityController
                     if (Physics.Raycast(transform.position, behind, out rhit) && rhit.transform.gameObject.GetComponent<Renderer>().material.color == Color.red)
                     {
                         Debug.Log("attack enemy at position " + hit.transform.position);
-                        hit.transform.gameObject.GetComponent<EntityController>().TakeDamage();
-                        EndTurn();
+                        hit.transform.gameObject.GetComponent<EnemyController>().TakeDamage();
                     }
                 }
-            }*/
+            }
         }
-    }
+	}
 
     void recolor()
     {
-        Debug.Log(actualPosition);
         for (int i = (int)actualPosition.x - maxMove - range; i <= (int)actualPosition.x + maxMove + range; i++)
         {
             for (int j = (int)actualPosition.y - maxMove - range; j <= (int)actualPosition.y + maxMove + range; j++)
             {
+                //Debug.Log(i + " " + j);
                 if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove)
                 {
                     GameObject go = ArenaManager.Instance.getTile(i, j);
@@ -150,9 +184,9 @@ public class PlayerController : EntityController
         Debug.Log("recolor");
     }
 
-    public void repaint(List<GameObject> tiles)
+    void repaint(List<GameObject> tiles)
     {
-        foreach (GameObject tile in tiles)
+        foreach(GameObject tile in tiles)
         {
             tile.gameObject.GetComponent<Renderer>().material.color = Color.white;
         }
@@ -166,6 +200,7 @@ public class PlayerController : EntityController
 
         while (Vector3.Distance(transform.position, lastTarget) > 0.1f)
         {
+            Debug.Log("je bouge");
             Vector3 nextTarget = target[0].getPosition();
             if (Vector3.Distance(transform.position, nextTarget) > 0.1f)
             {
@@ -180,26 +215,9 @@ public class PlayerController : EntityController
             }
         }
 
-        actualPosition = new Vector2(lastTarget.x, lastTarget.z);
+        actualPosition = new Vector2(lastTarget.x, lastTarget.y);
         repaint(tiles);
         roadOfTiles.Clear();
         moovng = false;
     }
-
-    public override void BeginTurn()
-    {
-        Debug.Log("begin player");
-        recolor();
-    }
-
-    public override void TakeDamage()
-    {
-        Destroy(gameObject);
-    }
-
-    public override void ChooseSpell()
-    {
-        
-    }
-
 }

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ArenaGeneration : MonoBehaviour
+public class ArenaManager: MonoBehaviour
 {
     public GameObject floor;
     public GameObject wall;
@@ -24,25 +24,20 @@ public class ArenaGeneration : MonoBehaviour
 	private GameObject papaMur;
     private bool end;
 
-    public static ArenaGeneration instance = null;
-
-    void Awake()
+    static ArenaManager instance;
+    public static ArenaManager Instance
     {
-        if(ArenaGeneration.instance == null)
+        get
         {
-            instance = this;
-        }
-        else if(ArenaGeneration.instance != this)
-        {
-            Destroy(this.gameObject);
+            return instance;
         }
     }
-
-    // Use this for initialization
-    void Start ()
+    void Awake ()
     {
         end = false;
 		GameObject GrandPa = new GameObject();
+        instance = this;
+
 		GrandPa.name = "GrandPa";
 		papaSol = new GameObject();
 		papaSol.name = "PapaSol";
@@ -86,6 +81,10 @@ public class ArenaGeneration : MonoBehaviour
             }
         }
 
+        //Check voisins
+        CheckNeighboors();
+
+
         while(end == false)
         {
             Colorate();
@@ -104,6 +103,52 @@ public class ArenaGeneration : MonoBehaviour
         GameObject go = Instantiate(player, new Vector3(0,player.transform.localScale.y/2,0), Quaternion.identity) as GameObject;
         Camera.main.transform.parent = go.transform;
         Camera.main.transform.localPosition = new Vector3(0, 10, 0);
+        GameObject go2 = Instantiate(player, new Vector3(width-1, player.transform.localScale.y / 2, 0), Quaternion.identity) as GameObject;
+
+        GameObject go3 = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, height-1), Quaternion.identity) as GameObject;
+
+        GameObject go4 = Instantiate(player, new Vector3(width - 1, player.transform.localScale.y / 2, height - 1), Quaternion.identity) as GameObject;
+
+        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
+        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TWOATTACKS);
+        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+
+        go2.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
+
+        go3.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TWOATTACKS);
+        go3.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+
+        go4.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
+        go4.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+    }
+
+    void CheckNeighboors()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                CubeScript cs = arena[i, j].GetComponent<CubeScript>();
+                if (getTile(i, j+1) != null)
+                {
+                    if (wallArena[i, j][0] == 0) cs.neighbor.Add(arena[i, j + 1].GetComponent<CubeScript>());
+                }
+                if (getTile(i+1, j) != null)
+                {
+                    if (wallArena[i, j][1] == 0) cs.neighbor.Add(arena[i+1,j].GetComponent<CubeScript>());
+                }
+                if (getTile(i - 1, j) != null)
+                {
+                    if (wallArena[i, j][2] == 0) cs.neighbor.Add(arena[i-1,j].GetComponent<CubeScript>());
+                }
+                if (getTile(i,j- 1) != null)
+                {
+                    if (wallArena[i, j][3] == 0) cs.neighbor.Add(arena[i,j-1].GetComponent<CubeScript>());
+                }
+
+
+            }
+        }
     }
 
     // Cette méthode permet de créer les murs autour et dans l'arène
@@ -139,8 +184,6 @@ public class ArenaGeneration : MonoBehaviour
 			currentWallContour.transform.parent = papaMur.transform;
         }
 		
-		
-		// Création des murs au milieu de l'arène
         randomSpawnWall = Random.Range(0, 100);
         if(randomSpawnWall < chanceSpawnWall)
         {
@@ -434,7 +477,7 @@ public class ArenaGeneration : MonoBehaviour
     // Ce n'est pas moi qui ait écrit cette fonction, du moins je ne me souviens pas
     public GameObject getTile(int x, int y)
     {
-        if (x < height-1 && y < width-1 && x>=0 && y>=0)
+        if (x < height && y < width  && x>=0 && y>=0)
         {
             return arena[x, y];
         }
