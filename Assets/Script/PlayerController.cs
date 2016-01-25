@@ -96,34 +96,75 @@ public class PlayerController : EntityController
 
     void recolor()
     {
-        Debug.Log(actualPosition);
-        for (int i = (int)actualPosition.x - maxMove - range; i <= (int)actualPosition.x + maxMove + range; i++)
+        for(int i =0; i < maxMove; i++)
         {
-            for (int j = (int)actualPosition.y - maxMove - range; j <= (int)actualPosition.y + maxMove + range; j++)
+            Colorate();
+        }
+    }
+    void Colorate()
+    {
+        GameObject[,] arena = ArenaManager.Instance.arena;
+        int[,][] wallArena = ArenaManager.Instance.wallArena;
+        int height = ArenaManager.Instance.height;
+        int width = ArenaManager.Instance.width;
+        tiles.Add(arena[(int)actualPosition.x, (int)actualPosition.y]);
+        arena[(int)actualPosition.x, (int)actualPosition.y].gameObject.GetComponent<Renderer>().material.color = movColor;
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
             {
-                if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove)
+                if (arena[i, j].gameObject.GetComponent<Renderer>().material.color == movColor)
                 {
-                    GameObject go = ArenaManager.Instance.getTile(i, j);
-                    if (go)
+                    for (int k = 0; k < 4; k++)
                     {
-                        go.gameObject.GetComponent<Renderer>().material.color = movColor;
-                        go.GetComponent<CubeScript>().SetInteractableForMove(true);
-                        tiles.Add(go);
-                    }
-                }
-                else if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= maxMove + range)
-                {
-                    GameObject go = ArenaManager.Instance.getTile(i, j);
-                    if (go)
-                    {
-                        go.gameObject.GetComponent<Renderer>().material.color = Color.red;
-                        tiles.Add(go);
+                        if (wallArena[i, j][k] == 0)
+                        {
+                            switch (k)
+                            {
+                                case 0:
+                                    if (arena[i, j + 1].gameObject.GetComponent<Renderer>().material.color != movColor)
+                                    {
+                                        arena[i, j + 1].gameObject.GetComponent<Renderer>().material.color = Color.red;
+                                    }
+                                    break;
+                                case 1:
+                                    if (arena[i + 1, j].gameObject.GetComponent<Renderer>().material.color != movColor)
+                                    {
+                                        arena[i + 1, j].gameObject.GetComponent<Renderer>().material.color = Color.red;
+                                    }
+                                    break;
+                                case 2:
+                                    if (arena[i - 1, j].gameObject.GetComponent<Renderer>().material.color != movColor)
+                                    {
+                                        arena[i - 1, j].gameObject.GetComponent<Renderer>().material.color = Color.red;
+                                    }
+                                    break;
+                                case 3:
+                                    if (arena[i, j - 1].gameObject.GetComponent<Renderer>().material.color != movColor)
+                                    {
+                                        arena[i, j - 1].gameObject.GetComponent<Renderer>().material.color = Color.red;
+                                    }
+                                    break;
+                            }
+                        }
                     }
                 }
             }
         }
-        Debug.Log("recolor");
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (arena[i, j].gameObject.GetComponent<Renderer>().material.color == Color.red)
+                {
+                    arena[i, j].gameObject.GetComponent<Renderer>().material.color = movColor;
+                    arena[i, j].GetComponent<CubeScript>().SetInteractableForMove(true);
+                    tiles.Add(arena[i, j]);
+                }
+            }
+        }
     }
+
 
     public void repaint(List<GameObject> tiles)
     {
