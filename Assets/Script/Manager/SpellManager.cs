@@ -40,6 +40,10 @@ public class SpellManager : MonoBehaviour {
 
     CubeScript target;
 
+    public Color attackZoneColor = Color.red;
+    public Color nonAttackZoneColor = Color.green;
+    public Color tileSelectedColor = Color.yellow;
+
     // Use this for initialization
     void Start () {
         dropdownObject = dropdown.gameObject;
@@ -103,7 +107,7 @@ public class SpellManager : MonoBehaviour {
     
     void CreateSpellZone(int range, bool attack)
     {
-        Color color = attack ? Color.red : Color.green;
+        Color color = attack ? attackZoneColor : nonAttackZoneColor;
         Vector2 actualPosition = currentPlayer.GetComponent<EntityController>().actualPosition;
         
         ClearZone();
@@ -155,12 +159,14 @@ public class SpellManager : MonoBehaviour {
 
         if (target)
         {
+            //effet du sort sur la case target
             target.occupant.TakeDamage(-TurnManager.Instance.currentPlayer.damage);
 
             TurnManager.Instance.SkipAction();
         }
         else
         {
+            //creation de la zone du sort
             CreateSpellZone(0, false);
         }
     }
@@ -168,7 +174,7 @@ public class SpellManager : MonoBehaviour {
     void TwoAttacks()
     {
         Debug.Log("two attacks");
-        if (target)
+        if (target && target.occupant)
         {
             target.occupant.TakeDamage(TurnManager.Instance.currentPlayer.damage);
             target.occupant.TakeDamage(TurnManager.Instance.currentPlayer.damage);

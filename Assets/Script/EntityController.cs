@@ -52,7 +52,9 @@ public class EntityController : MonoBehaviour {
 	void Update () {
 	
 	}
-    
+
+    public virtual void TileToMoveSelected(){}
+
     public virtual void BeginTurn()
     {
         Debug.Log("begin entity");
@@ -114,9 +116,7 @@ public class EntityController : MonoBehaviour {
     }
 
     public virtual void SkipAction() { }
-
-    public virtual void ChooseSpell(){}
-
+    
     public void AddSpell(SpellManager.SPELL spell)
     {
         spells.Add(spell);
