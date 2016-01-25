@@ -8,21 +8,22 @@ public class PlayerController : EntityController
 
     bool dropdownCreated = false;
 
-    void Start()
+    bool willMove = false;
+
+    Color movColor;
+
+    protected override void Start()
     {
+        base.Start();
+
         canMove = true;
         canAttack = true;
 
         tiles = new List<GameObject>();
 
-        Vector3 behind = -transform.TransformDirection(Vector3.up);
+        UpdatePosition();
 
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, behind, out hit))
-        {
-            actualPosition = new Vector2(hit.transform.position.x, hit.transform.position.z);
-        }
+        movColor = MovementManager.Instance.movementColor;
     }
 
     // Update is called once per frame
@@ -42,6 +43,7 @@ public class PlayerController : EntityController
         if (canMove == true)
         {
             canMove = false;
+            willMove = false;
         }
         else
         {
@@ -49,22 +51,27 @@ public class PlayerController : EntityController
             EndTurn();
         }
     }
+    
+    public override void TileToMoveSelected()
+    {
+        willMove = true;
+    }
 
     void MoveAction()
     {
-        if (canMove && Input.GetMouseButtonDown(0))
+        if (canMove && willMove)
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray.origin, ray.direction, out hit))
             {
-                if (hit.transform.tag == "Tile" && hit.transform.gameObject.GetComponent<Renderer>().material.color == Color.blue)
+                if (hit.transform.tag == "Tile" && hit.transform.gameObject.GetComponent<Renderer>().material.color == SpellManager.Instance.tileSelectedColor)
                 {
                     {
-                        hit.transform.gameObject.GetComponent<Renderer>().material.color = Color.yellow;
                         //transform.Translate(new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z));
                         //transform.position = new Vector3(hit.transform.position.x, transform.position.y, hit.transform.position.z);
                         canMove = false;
+                        willMove = false;
                         roadOfTiles = MovementManager.Instance.findPath(transform.position, hit.transform.position);
 
                         if (roadOfTiles.Count > 0)
@@ -84,39 +91,6 @@ public class PlayerController : EntityController
             SpellManager.Instance.CreateDropDown(this);
             dropdownCreated = true;
 
-            /*for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
-            {
-                for (int j = (int)actualPosition.y - range; j <= (int)actualPosition.y + range; j++)
-                {
-                    if (Mathf.Abs(j - (int)actualPosition.y) + Mathf.Abs(i - (int)actualPosition.x) <= range)
-                    {
-                        GameObject go = ArenaManager.Instance.getTile(i, j); if (go)
-                        {
-                            go.gameObject.GetComponent<Renderer>().material.color = Color.red;
-                            tiles.Add(go);
-                        }
-                    }
-                }
-            }
-            if (Input.GetMouseButton(0))
-            {
-                RaycastHit hit;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                if (Physics.Raycast(ray.origin, ray.direction, out hit) && (hit.transform.tag == "Enemy" || hit.transform.tag == "Player"))
-                {
-                    Vector3 behind = -hit.transform.TransformDirection(Vector3.up);
-
-                    RaycastHit rhit;
-
-                    if (Physics.Raycast(transform.position, behind, out rhit) && rhit.transform.gameObject.GetComponent<Renderer>().material.color == Color.red)
-                    {
-                        Debug.Log("attack enemy at position " + hit.transform.position);
-                        hit.transform.gameObject.GetComponent<EntityController>().TakeDamage();
-                        EndTurn();
-                    }
-                }
-            }*/
         }
     }
 
@@ -132,7 +106,8 @@ public class PlayerController : EntityController
                     GameObject go = ArenaManager.Instance.getTile(i, j);
                     if (go)
                     {
-                        go.gameObject.GetComponent<Renderer>().material.color = Color.blue;
+                        go.gameObject.GetComponent<Renderer>().material.color = movColor;
+                        go.GetComponent<CubeScript>().SetInteractableForMove(true);
                         tiles.Add(go);
                     }
                 }
@@ -155,6 +130,7 @@ public class PlayerController : EntityController
         foreach (GameObject tile in tiles)
         {
             tile.gameObject.GetComponent<Renderer>().material.color = Color.white;
+            tile.GetComponent<CubeScript>().SetInteractableForMove(false);
         }
         tiles.Clear();
     }
@@ -180,7 +156,8 @@ public class PlayerController : EntityController
             }
         }
 
-        actualPosition = new Vector2(lastTarget.x, lastTarget.z);
+        UpdatePosition();
+
         repaint(tiles);
         roadOfTiles.Clear();
         moovng = false;
@@ -192,14 +169,10 @@ public class PlayerController : EntityController
         recolor();
     }
 
-    public override void TakeDamage()
+    public override void TakeDamage(int n)
     {
-        Destroy(gameObject);
-    }
-
-    public override void ChooseSpell()
-    {
-        
+        base.TakeDamage(n);
+        //Destroy(gameObject);
     }
 
 }

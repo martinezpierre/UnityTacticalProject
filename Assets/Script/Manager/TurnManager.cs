@@ -81,6 +81,8 @@ public class TurnManager : MonoBehaviour {
         yield return new WaitForEndOfFrame();
         if (!gameFinished)
         {
+            SpellManager.Instance.ResetSpell();
+
             currentPlayerIndex = (currentPlayerIndex + 1) % entities.Count;
 
             currentPlayer = entities[currentPlayerIndex];

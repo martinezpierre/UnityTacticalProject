@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class SpellManager : MonoBehaviour {
@@ -30,16 +31,25 @@ public class SpellManager : MonoBehaviour {
 
     GameObject currentPlayer;
 
-    public SPELL[] spellinDropdown;
+    public SPELL[] spellInDropdown;
+    SPELL currentSpell;
 
     public int nbSpellMax = 10;
+
+    public List<CubeScript> cubes;
+
+    CubeScript target;
+
+    public Color attackZoneColor = Color.red;
+    public Color nonAttackZoneColor = Color.green;
+    public Color tileSelectedColor = Color.yellow;
 
     // Use this for initialization
     void Start () {
         dropdownObject = dropdown.gameObject;
         dropdownObject.SetActive(false);
 
-        spellinDropdown = new SPELL[nbSpellMax];
+        spellInDropdown = new SPELL[nbSpellMax];
     }
 	
 	// Update is called once per frame
@@ -63,7 +73,7 @@ public class SpellManager : MonoBehaviour {
 
         foreach (SPELL spell in eC.spells)
         {
-            spellinDropdown[index] = spell;
+            spellInDropdown[index] = spell;
 
             dropdown.options.Add(new Dropdown.OptionData() { text = ""+spell });
 
@@ -75,7 +85,8 @@ public class SpellManager : MonoBehaviour {
 
     public void SpellSelected()
     {
-        CastSpell(spellinDropdown[dropdown.value]);
+        currentSpell = spellInDropdown[dropdown.value];
+        CastSpell(currentSpell);
     }
 
     public void CastSpell(SPELL spellName)
@@ -93,15 +104,13 @@ public class SpellManager : MonoBehaviour {
                 break;
         }
     }
-
+    
     void CreateSpellZone(int range, bool attack)
     {
-        Color color = attack ? Color.red : Color.green;
+        Color color = attack ? attackZoneColor : nonAttackZoneColor;
         Vector2 actualPosition = currentPlayer.GetComponent<EntityController>().actualPosition;
-
-        PlayerController pC = currentPlayer.GetComponent<PlayerController>();
-
-        pC.repaint(pC.tiles);
+        
+        ClearZone();
 
         for (int i = (int)actualPosition.x - range; i <= (int)actualPosition.x + range; i++)
         {
@@ -114,27 +123,95 @@ public class SpellManager : MonoBehaviour {
                         Debug.Log("create zone condition 2");
                         go.gameObject.GetComponent<Renderer>().material.color = color;
                         currentPlayer.GetComponent<EntityController>().tiles.Add(go);
+                        go.GetComponent<CubeScript>().SetInteractable(true);
+                        cubes.Add(go.GetComponent<CubeScript>());
                     }
                 }
             }
         }
     }
+    
+    public void CaseSelected(CubeScript cS)
+    {
+        ClearZone();
+
+        target = cS;
+
+        CastSpell(currentSpell);
+    }
+
+    public void ClearZone()
+    {
+        PlayerController pC = currentPlayer.GetComponent<PlayerController>();
+
+        pC.repaint(pC.tiles);
+
+        foreach (CubeScript c in cubes)
+        {
+            c.SetInteractable(false);
+        }
+        cubes.Clear();
+    }
 
     void Heal()
     {
         Debug.Log("heal");
-        CreateSpellZone(2, false);
+
+        if (target)
+        {
+            //effet du sort sur la case target
+            target.occupant.TakeDamage(-TurnManager.Instance.currentPlayer.damage);
+
+            TurnManager.Instance.SkipAction();
+        }
+        else
+        {
+            //creation de la zone du sort
+            CreateSpellZone(0, false);
+        }
     }
 
     void TwoAttacks()
     {
         Debug.Log("two attacks");
-        CreateSpellZone(1, true);
+        if (target && target.occupant)
+        {
+            target.occupant.TakeDamage(TurnManager.Instance.currentPlayer.damage);
+            target.occupant.TakeDamage(TurnManager.Instance.currentPlayer.damage);
+
+            TurnManager.Instance.SkipAction();
+        }
+        else
+        {
+            CreateSpellZone(1, true);
+        }
     }
 
     void Teleportation()
     {
         Debug.Log("teleportation");
-        CreateSpellZone(10, false);
+        if (target)
+        {
+            currentPlayer.transform.position = new Vector3(target.transform.position.x, currentPlayer.transform.position.y, target.transform.position.z);
+            currentPlayer.GetComponent<EntityController>().UpdatePosition();
+
+            TurnManager.Instance.SkipAction();
+        }
+        else
+        {
+            CreateSpellZone(10, false);
+        }
+    }
+
+    public void ResetSpell()
+    {
+
+        target = null;
+
+        dropdown.value = 0;
+        
+        ClearZone();
+
+        dropdownObject.SetActive(false);
     }
 }

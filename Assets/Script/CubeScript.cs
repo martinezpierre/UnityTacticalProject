@@ -15,16 +15,69 @@ public class CubeScript : MonoBehaviour {
     public List<CubeScript> neighbor = new List<CubeScript>();
     public int[] tile;
 
+    bool interactable = false;
+    bool interactableForMove = false;
+
+    Color backupColor;
+    Material myMat;
+
+    public EntityController occupant;
+
+    Color selectionColor;
+
     // Use this for initialization
     void Start () {
         position = transform.position + (Vector3.up / 2);
         //Invoke("getNeighbors", 1);
-	}
+
+        selectionColor = SpellManager.Instance.tileSelectedColor;
+
+        myMat = GetComponent<Renderer>().material;
+    }
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
+
+    void OnMouseEnter()
+    {
+        if (!interactable && !interactableForMove) return;
+
+        backupColor = myMat.color;
+        myMat.color = selectionColor;
+    }
+
+    void OnMouseExit()
+    {
+        if (!interactable && !interactableForMove) return;
+
+        myMat.color = backupColor;
+    }
+
+    void OnMouseDown()
+    {
+       if (!interactable && !interactableForMove) return;
+
+        if (interactable)
+        {
+            SpellManager.Instance.CaseSelected(this);
+        }
+        else
+        {
+            TurnManager.Instance.currentPlayer.TileToMoveSelected();
+        }
+    }
+
+    public void SetInteractable(bool b)
+    {
+        interactable = b;
+    }
+
+    public void SetInteractableForMove(bool b)
+    {
+        interactableForMove = b;
+    }
 
     /*private void getNeighbors()
     {

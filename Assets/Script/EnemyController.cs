@@ -2,9 +2,12 @@
 using System.Collections;
 
 public class EnemyController : EntityController {
-    
+
     // Use this for initialization
-    void Start () {
+    protected override void Start () {
+
+        base.Start();
+
         canMove = true;
         canAttack = true;
     }
@@ -19,8 +22,9 @@ public class EnemyController : EntityController {
         Debug.Log("begin enemy");
     }
 
-    public override void TakeDamage()
+    public override void TakeDamage(int n)
     {
-        Destroy(gameObject);
+        base.TakeDamage(n);
+        //Destroy(gameObject);
     }
 }

@@ -38,6 +38,8 @@ public class MovementManager : MonoBehaviour {
 
     static private DuplicateKeyComparer<float> Comparer = new DuplicateKeyComparer<float>();
 
+    public Color movementColor = Color.blue;
+
     public List<CubeScript> findPath(Vector3 start, Vector3 end)
     {
         CubeScript endTile = foundTile(end);
