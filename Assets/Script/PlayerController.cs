@@ -8,21 +8,16 @@ public class PlayerController : EntityController
 
     bool dropdownCreated = false;
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
+
         canMove = true;
         canAttack = true;
 
         tiles = new List<GameObject>();
 
-        Vector3 behind = -transform.TransformDirection(Vector3.up);
-
-        RaycastHit hit;
-
-        if (Physics.Raycast(transform.position, behind, out hit))
-        {
-            actualPosition = new Vector2(hit.transform.position.x, hit.transform.position.z);
-        }
+        UpdatePosition();
     }
 
     // Update is called once per frame
@@ -180,7 +175,8 @@ public class PlayerController : EntityController
             }
         }
 
-        actualPosition = new Vector2(lastTarget.x, lastTarget.z);
+        UpdatePosition();
+
         repaint(tiles);
         roadOfTiles.Clear();
         moovng = false;
@@ -192,9 +188,10 @@ public class PlayerController : EntityController
         recolor();
     }
 
-    public override void TakeDamage()
+    public override void TakeDamage(int n)
     {
-        Destroy(gameObject);
+        base.TakeDamage(n);
+        //Destroy(gameObject);
     }
 
     public override void ChooseSpell()
