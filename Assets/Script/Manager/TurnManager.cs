@@ -31,6 +31,10 @@ public class TurnManager : MonoBehaviour {
     
     public List<EntityController> entities;
 
+    public List<Color> playersColor;
+
+    int nbColorAffected = 0;
+
     // Use this for initialization
     void Start () {
         cam = Camera.main.gameObject;
@@ -53,6 +57,19 @@ public class TurnManager : MonoBehaviour {
         SetCamera();
     }
     
+    public Color GetColor()
+    {
+        nbColorAffected++;
+
+        return playersColor[nbColorAffected-1];
+    }
+
+    public void Add(EntityController eC)
+    {
+        eC.id = entities.Count;
+        entities.Add(eC);
+    }
+
     public void Remove(EntityController eC)
     {
         entities.Remove(eC);

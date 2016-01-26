@@ -21,13 +21,15 @@ public class SpellManager : MonoBehaviour {
 
     public enum SPELL
     {
+        ATTACK,
         HEAL,
         TWOATTACKS,
         TELEPORTATION,
         REDUCTIONDAMAGE,
         ATTACKLONGRANGE,
         COUNTERATTACK,
-        STUN
+        STUN,
+        INVOCATION
     }
 
     public List<SPELL> spellsP1;
@@ -60,6 +62,8 @@ public class SpellManager : MonoBehaviour {
 
     public int nbCounterattack = 1;
     public int nbTurnCounterMax = 3;
+
+    public GameObject InvocationPrefab;
     
     // Use this for initialization
     void Start () {
@@ -101,6 +105,9 @@ public class SpellManager : MonoBehaviour {
     {
         switch (spellName)
         {
+            case SPELL.ATTACK:
+                Attack();
+                break;
             case SPELL.HEAL:
                 Heal();
                 break;
@@ -121,6 +128,9 @@ public class SpellManager : MonoBehaviour {
                 break;
             case SPELL.STUN:
                 Stun();
+                break;
+            case SPELL.INVOCATION:
+                Invocation();
                 break;
         }
     }
@@ -172,11 +182,25 @@ public class SpellManager : MonoBehaviour {
         cubes.Clear();
     }
 
+    void Attack()
+    {
+        if (target && target.occupant)
+        {
+            AudioSource.PlayClipAtPoint(SoundManager.Instance.GetAttackSound(), target.transform.position);
+            SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 1);
+        }
+        else
+        {
+            CreateSpellZone(1, true);
+        }
+    }
+
     void Heal()
     {
-        if (target)
+        if (target && target.occupant)
         {
             //effet du sort sur la case target
+            AudioSource.PlayClipAtPoint(SoundManager.Instance.healSound, target.transform.position);
             target.occupant.TakeDamage(-TurnManager.Instance.currentPlayer.damage);
 
             TurnManager.Instance.SkipAction();
@@ -192,7 +216,8 @@ public class SpellManager : MonoBehaviour {
     {
         if (target && target.occupant)
         {
-            SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 10);
+            AudioSource.PlayClipAtPoint(SoundManager.Instance.GetAttackSound(), target.transform.position);
+            SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 2);
         }
         else
         {
@@ -204,6 +229,7 @@ public class SpellManager : MonoBehaviour {
     {
         if (target && !target.occupant)
         {
+            AudioSource.PlayClipAtPoint(SoundManager.Instance.teleportationSound, target.transform.position);
             currentPlayer.transform.position = new Vector3(target.transform.position.x, currentPlayer.transform.position.y, target.transform.position.z);
             currentPlayer.GetComponent<EntityController>().UpdatePosition();
 
@@ -219,6 +245,7 @@ public class SpellManager : MonoBehaviour {
     {
         if (target)
         {
+            AudioSource.PlayClipAtPoint(SoundManager.Instance.reducDamageSound, target.transform.position);
             currentPlayer.GetComponent<EntityController>().SetDamageReduction(damageReduction, nbTurnDamageReducMax);
 
             TurnManager.Instance.SkipAction();
@@ -233,6 +260,7 @@ public class SpellManager : MonoBehaviour {
     {
         if (target && target.occupant)
         {
+            AudioSource.PlayClipAtPoint(SoundManager.Instance.GetLaserSound(), target.transform.position);
             SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 1);
 
         }
@@ -246,6 +274,7 @@ public class SpellManager : MonoBehaviour {
     {
         if (target)
         {
+            AudioSource.PlayClipAtPoint(SoundManager.Instance.buffSound, target.transform.position);
             currentPlayer.GetComponent<EntityController>().SetCounter(nbCounterattack, nbTurnCounterMax);
 
             TurnManager.Instance.SkipAction();
@@ -262,6 +291,7 @@ public class SpellManager : MonoBehaviour {
         {
             if (Random.Range(0f, 1f) > 0.8f)
             {
+                AudioSource.PlayClipAtPoint(SoundManager.Instance.stunSound, target.transform.position);
                 target.occupant.stunned = true;
             }
 
@@ -270,6 +300,18 @@ public class SpellManager : MonoBehaviour {
         else
         {
             CreateSpellZone(1, true);
+        }
+    }
+
+    void Invocation()
+    {
+        if (target && !target.occupant)
+        {
+            StartCoroutine(InvocAnim(new Vector3(target.transform.position.x, InvocationPrefab.transform.localScale.y / 2, target.transform.position.z)));
+        }
+        else
+        {
+            CreateSpellZone(1, false);
         }
     }
 
@@ -313,6 +355,22 @@ public class SpellManager : MonoBehaviour {
         }
 
         yield return new WaitForSeconds(2f);
+
+        TurnManager.Instance.SkipAction();
+    }
+
+    IEnumerator InvocAnim(Vector3 pos)
+    {
+        AudioSource.PlayClipAtPoint(SoundManager.Instance.GetInvocSound(), target.transform.position);
+
+        GameObject go = Instantiate(InvocationPrefab, pos, Quaternion.identity) as GameObject;
+        EntityController eC = go.GetComponent<EntityController>();
+        eC.AddSpell(SPELL.ATTACK);
+        eC.lifeBar.color = TurnManager.Instance.currentPlayer.lifeBar.color;
+        
+        TurnManager.Instance.Add(eC);
+
+        yield return new WaitForSeconds(1.5f);
 
         TurnManager.Instance.SkipAction();
     }

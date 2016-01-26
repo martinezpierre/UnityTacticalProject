@@ -26,7 +26,6 @@ public class EntityController : MonoBehaviour {
     protected int life;
 
     public GameObject EntityCanvas;
-    Slider lifeSlider;
 
     public int damage = 10;
 
@@ -50,18 +49,22 @@ public class EntityController : MonoBehaviour {
     
     [HideInInspector]public  Animation anim;
 
-
+    public Image lifeBar;
+    public Slider lifeSlider;
 
     // Use this for initialization
     protected virtual void Start () {
 
-        life = 100;
+        life = maxLife;
 
-        GameObject go = Instantiate(EntityCanvas);
+        /*GameObject go = Instantiate(EntityCanvas);
         go.transform.parent = gameObject.transform;
-        go.GetComponent<RectTransform>().localPosition = Vector3.zero;
+        go.GetComponent<RectTransform>().localPosition = Vector3.zero;*/
 
-        lifeSlider = go.transform.Find("Life").GetComponent<Slider>();
+        if(id < 4)
+        {
+            lifeBar.color = TurnManager.Instance.GetColor();
+        }
 
         lifeSlider.value = life / maxLife;
         
@@ -103,7 +106,7 @@ public class EntityController : MonoBehaviour {
     }
 
     public virtual void TakeDamage(int n){
-        
+
         anim.Play("Damage");
 
         life -= (int)(n * damageReduction);
