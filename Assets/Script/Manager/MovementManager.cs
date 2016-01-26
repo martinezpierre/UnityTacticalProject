@@ -4,7 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class MovementManager : MonoBehaviour {
+public class MovementManager : MonoBehaviour
+{
 
     static MovementManager instance;
     public static MovementManager Instance
@@ -42,6 +43,7 @@ public class MovementManager : MonoBehaviour {
 
     public List<CubeScript> findPath(Vector3 start, Vector3 end)
     {
+
         CubeScript endTile = foundTile(end);
         CubeScript startTile = foundTile(start);
         return findPathFromTile(startTile, endTile);
@@ -51,7 +53,8 @@ public class MovementManager : MonoBehaviour {
         float distance = 0;
         float smallDistance = 99999;
         CubeScript nearTile = null;
-        foreach (CubeScript currentTile in ArenaManager.Instance.listCubeScript)        {
+        foreach (CubeScript currentTile in ArenaManager.Instance.listCubeScript)
+        {
             distance = Vector3.Distance(tile, currentTile.getPosition());
             if (distance < smallDistance)
             {
@@ -69,7 +72,7 @@ public class MovementManager : MonoBehaviour {
         {
             r.Add(node.getPosition());
         }*/
-        
+
         return road;
     }
 
@@ -87,30 +90,39 @@ public class MovementManager : MonoBehaviour {
         CubeScript currentTile = null;
         CubeScript previousNode = tileStart;
         List<CubeScript> listTile;
-        tryTile.Add(Vector3.Distance(tileStart.getPosition(), tileEnd.getPosition()), tileStart);
+        tryTile.Add(Vector2.Distance(tileStart.getPosition(), tileEnd.getPosition()), tileStart);
+        checkedTile.Add(tileStart);
+        tileStart.distance = Vector2.Distance(tileStart.getPosition(), tileEnd.getPosition());
+
         while ((currentTile != tileEnd) && (tryTile.Count > 0))
         {
-
             currentTile = tryTile.ElementAt(0).Value;
             tryTile.RemoveAt(0);
             listTile = currentTile.neighbor;
+
             foreach (CubeScript node in listTile)
             {
                 if (!checkedTile.Contains(node))
                 {
-                    currentDist = Vector3.Distance(previousNode.getPosition(), node.getPosition()) + previousNode.distance;
-                    currentEury = Vector3.Distance(node.getPosition(), tileEnd.getPosition());
+                    currentDist = Vector2.Distance(previousNode.getPosition(), node.getPosition()) + previousNode.distance;
+                    currentEury = Vector2.Distance(node.getPosition(), tileEnd.getPosition());
 
                     cumule = currentDist + currentEury;
 
                     if (cumule < (node.heurystic + node.distance))
                     {
-                        node.heurystic = currentDist;
-                        node.distance = currentEury;
+                        node.heurystic = currentEury;
+                        node.distance = currentDist;
                         node.cumule = currentDist + currentEury;
                         node.previousTile = currentTile;
 
                         tryTile.Add(node.cumule, node);
+                    }
+                    else
+                    {
+                        /*Debug.Log("Case : " + node.tile[0] + "," + node.tile[1]);
+                        Debug.Log("CurrentCumule = " + cumule + " et addition = " + (node.heurystic + node.distance));
+                        Debug.Log(tryTile.Count);*/
                     }
                 }
 
@@ -118,17 +130,21 @@ public class MovementManager : MonoBehaviour {
             checkedTile.Add(currentTile);
         }
 
+
+
         if (currentTile == tileEnd)
         {
-            return returnRoad(currentTile, checkedTile);
+            return returnRoad(currentTile, checkedTile, tryTile);
         }
         else
         {
-            return null;
+            /*Debug.Log("Depart : "+tileStart.tile[0] + " et " + tileStart.tile[1]);
+            Debug.Log("Arrivée : " + tileEnd.tile[0] + " et " + tileEnd.tile[1]);*/
+            return new List<CubeScript>();
         }
 
     }
-    public List<CubeScript> returnRoad(CubeScript currentTile,  List<CubeScript> checkedTile)
+    public List<CubeScript> returnRoad(CubeScript currentTile, List<CubeScript> checkedTile, SortedList<float, CubeScript> tryTile)
     {
         List<CubeScript> onTheRoad = new List<CubeScript>();
         while (currentTile.previousTile != null)
@@ -136,19 +152,27 @@ public class MovementManager : MonoBehaviour {
             onTheRoad.Insert(0, currentTile);
             currentTile = currentTile.previousTile;
         }
-        ResetTile(checkedTile);
+        ResetTile(checkedTile, tryTile);
         return onTheRoad;
     }
 
 
-    void ResetTile(List<CubeScript> checkedTile)
+    void ResetTile(List<CubeScript> checkedTile, SortedList<float, CubeScript> tryTile)
     {
-        foreach(CubeScript CS in checkedTile)
+        Debug.Log(checkedTile.Count);
+        foreach (CubeScript CS in checkedTile)
         {
             CS.distance = 9999;
             CS.heurystic = 9999;
             CS.previousTile = null;
             CS.cumule = 0;
+        }
+        for (int i = 0; i < tryTile.Count(); ++i)
+        {
+            tryTile.ElementAt(i).Value.distance = 9999;
+            tryTile.ElementAt(i).Value.heurystic = 9999;
+            tryTile.ElementAt(i).Value.previousTile = null;
+            tryTile.ElementAt(i).Value.cumule = 0;
         }
     }
 

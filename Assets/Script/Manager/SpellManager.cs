@@ -23,8 +23,17 @@ public class SpellManager : MonoBehaviour {
     {
         HEAL,
         TWOATTACKS,
-        TELEPORTATION
+        TELEPORTATION,
+        REDUCTIONDAMAGE,
+        ATTACKLONGRANGE,
+        COUNTERATTACK,
+        STUN
     }
+
+    public List<SPELL> spellsP1;
+    public List<SPELL> spellsP2;
+    public List<SPELL> spellsP3;
+    public List<SPELL> spellsP4;
 
     public Dropdown dropdown;
     GameObject dropdownObject;
@@ -44,6 +53,14 @@ public class SpellManager : MonoBehaviour {
     public Color nonAttackZoneColor = Color.green;
     public Color tileSelectedColor = Color.yellow;
 
+    public int teleportationRange = 6;
+
+    public float damageReduction = 0.5f;
+    public int nbTurnDamageReducMax = 3;
+
+    public int nbCounterattack = 1;
+    public int nbTurnCounterMax = 3;
+    
     // Use this for initialization
     void Start () {
         dropdownObject = dropdown.gameObject;
@@ -52,15 +69,6 @@ public class SpellManager : MonoBehaviour {
         spellInDropdown = new SPELL[nbSpellMax];
     }
 	
-	// Update is called once per frame
-	void Update () {
-        /*if (Input.GetMouseButtonUp(0))
-        {
-            dropdownObject.SetActive(false);
-            TurnManager.Instance.SkipAction();
-        }*/
-    }
-
     public void CreateDropDown(EntityController eC)
     {
         currentPlayer = eC.gameObject;
@@ -102,9 +110,21 @@ public class SpellManager : MonoBehaviour {
             case SPELL.TELEPORTATION:
                 Teleportation();
                 break;
+            case SPELL.REDUCTIONDAMAGE:
+                ReductionDamage();
+                break;
+            case SPELL.ATTACKLONGRANGE:
+                AtackLongRange();
+                break;
+            case SPELL.COUNTERATTACK:
+                CounterAttack();
+                break;
+            case SPELL.STUN:
+                Stun();
+                break;
         }
     }
-    
+     
     void CreateSpellZone(int range, bool attack)
     {
         Color color = attack ? attackZoneColor : nonAttackZoneColor;
@@ -120,7 +140,6 @@ public class SpellManager : MonoBehaviour {
                 {
                     GameObject go = ArenaManager.Instance.getTile(i, j); if (go)
                     {
-                        Debug.Log("create zone condition 2");
                         go.gameObject.GetComponent<Renderer>().material.color = color;
                         currentPlayer.GetComponent<EntityController>().tiles.Add(go);
                         go.GetComponent<CubeScript>().SetInteractable(true);
@@ -155,8 +174,6 @@ public class SpellManager : MonoBehaviour {
 
     void Heal()
     {
-        Debug.Log("heal");
-
         if (target)
         {
             //effet du sort sur la case target
@@ -173,13 +190,9 @@ public class SpellManager : MonoBehaviour {
 
     void TwoAttacks()
     {
-        Debug.Log("two attacks");
         if (target && target.occupant)
         {
-            target.occupant.TakeDamage(TurnManager.Instance.currentPlayer.damage);
-            target.occupant.TakeDamage(TurnManager.Instance.currentPlayer.damage);
-
-            TurnManager.Instance.SkipAction();
+            SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 10);
         }
         else
         {
@@ -189,8 +202,7 @@ public class SpellManager : MonoBehaviour {
 
     void Teleportation()
     {
-        Debug.Log("teleportation");
-        if (target)
+        if (target && !target.occupant)
         {
             currentPlayer.transform.position = new Vector3(target.transform.position.x, currentPlayer.transform.position.y, target.transform.position.z);
             currentPlayer.GetComponent<EntityController>().UpdatePosition();
@@ -199,7 +211,65 @@ public class SpellManager : MonoBehaviour {
         }
         else
         {
-            CreateSpellZone(10, false);
+            CreateSpellZone(teleportationRange, false);
+        }
+    }
+
+    void ReductionDamage()
+    {
+        if (target)
+        {
+            currentPlayer.GetComponent<EntityController>().SetDamageReduction(damageReduction, nbTurnDamageReducMax);
+
+            TurnManager.Instance.SkipAction();
+        }
+        else
+        {
+            CreateSpellZone(0, false);
+        }
+    }
+
+    void AtackLongRange()
+    {
+        if (target && target.occupant)
+        {
+            SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 1);
+
+        }
+        else
+        {
+            CreateSpellZone(2, true);
+        }
+    }
+
+    void CounterAttack()
+    {
+        if (target)
+        {
+            currentPlayer.GetComponent<EntityController>().SetCounter(nbCounterattack, nbTurnCounterMax);
+
+            TurnManager.Instance.SkipAction();
+        }
+        else
+        {
+            CreateSpellZone(0, false);
+        }
+    }
+
+    void Stun()
+    {
+        if (target && target.occupant)
+        {
+            if (Random.Range(0f, 1f) > 0.8f)
+            {
+                target.occupant.stunned = true;
+            }
+
+            TurnManager.Instance.SkipAction();
+        }
+        else
+        {
+            CreateSpellZone(1, true);
         }
     }
 
@@ -213,5 +283,37 @@ public class SpellManager : MonoBehaviour {
         ClearZone();
 
         dropdownObject.SetActive(false);
+    }
+
+    public void SendDamage(EntityController attacker, EntityController defenser, int nbAttack)
+    {
+        if (!attacker || !defenser) return;
+
+        StartCoroutine(AttackAnim(attacker, defenser, nbAttack));
+    }
+
+    IEnumerator AttackAnim(EntityController attacker, EntityController defenser, int nbAttack)
+    {
+        attacker.transform.LookAt(defenser.transform);
+        attacker.anim.Play("Attack");
+
+        for (int i = 0; i < nbAttack; i++)
+        {
+            defenser.TakeDamage(attacker.damage);
+        }
+
+        if (defenser.counterattackCount > 0)
+        {
+            defenser.transform.LookAt(attacker.transform);
+            defenser.anim.Play("Attack");
+        }
+        for (int j = 0; j < defenser.counterattackCount; j++)
+        {
+            attacker.TakeDamage(defenser.damage);
+        }
+
+        yield return new WaitForSeconds(2f);
+
+        TurnManager.Instance.SkipAction();
     }
 }

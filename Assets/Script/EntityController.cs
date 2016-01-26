@@ -23,16 +23,34 @@ public class EntityController : MonoBehaviour {
     public int id;
 
     public int maxLife = 100;
-    int life;
+    protected int life;
 
     public GameObject EntityCanvas;
     Slider lifeSlider;
 
     public int damage = 10;
 
+    float damageReduction = 1f;
+    int nbTurn = 1;
+    int nbTurnMax = 3;
+
+    public int counterattackCount = 0;
+    int nbTurnCounter = 1;
+    int nbTurnMaxCounter = 3;
+
     public List<SpellManager.SPELL> spells;
 
+    [HideInInspector]
+    public bool dead = false;
+
+    [HideInInspector]
+    public bool stunned = false;
+
     CubeScript previousTile;
+    
+    [HideInInspector]public  Animation anim;
+
+
 
     // Use this for initialization
     protected virtual void Start () {
@@ -46,23 +64,49 @@ public class EntityController : MonoBehaviour {
         lifeSlider = go.transform.Find("Life").GetComponent<Slider>();
 
         lifeSlider.value = life / maxLife;
+        
+        anim = GetComponentInChildren<Animation>();
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+    // Update is called once per frame
+    protected virtual void Update () {
+        if (!anim.isPlaying && !dead)
+        {
+            anim.Play("Wait");
+        }
 	}
 
     public virtual void TileToMoveSelected(){}
 
     public virtual void BeginTurn()
     {
-        Debug.Log("begin entity");
+        if(damageReduction != 1f)
+        {
+            nbTurn++;
+            if (nbTurn >= nbTurnMax)
+            {
+                nbTurn = 1;
+                damageReduction = 1f;
+            }
+        }
+
+        if(counterattackCount != 0)
+        {
+            nbTurnCounter++;
+            if(nbTurnCounter >= nbTurnMaxCounter)
+            {
+                nbTurnCounter = 1;
+                counterattackCount = 0;
+            }
+        }
+        
     }
 
     public virtual void TakeDamage(int n){
+        
+        anim.Play("Damage");
 
-        life -= n;
+        life -= (int)(n * damageReduction);
         
         Mathf.Clamp(life, 0, maxLife);
 
@@ -70,23 +114,29 @@ public class EntityController : MonoBehaviour {
         
         if (life <= 0)
         {
-            Die();
+            StartCoroutine(Die());
         }
     }
 
-    void Die()
+    IEnumerator Die()
     {
-        Destroy(gameObject);
-    }
+        dead = true;
 
-    void OnDestroy()
-    {
+        anim.Play("Dead");
+
+        yield return new WaitForSeconds(2f);
+
+        if (previousTile)
+        {
+            previousTile.occupant = null;
+        }
+        
         TurnManager.Instance.Remove(this);
+        //Destroy(gameObject);
     }
-
+    
     public void EndTurn()
     {
-        Debug.Log("end turn");
 
         canMove = true;
         canAttack = true;
@@ -125,5 +175,17 @@ public class EntityController : MonoBehaviour {
     public void RemoveSpell(SpellManager.SPELL spell)
     {
         spells.Remove(spell);
+    }
+
+    public void SetDamageReduction(float f, int n)
+    {
+        damageReduction = f;
+        nbTurnMax = n;
+    }
+
+    public void SetCounter(int nbCounter, int nbTurn)
+    {
+        counterattackCount = nbCounter;
+        nbTurnMaxCounter = nbTurn;
     }
 }

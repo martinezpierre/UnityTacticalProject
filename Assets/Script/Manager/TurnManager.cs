@@ -47,8 +47,7 @@ public class TurnManager : MonoBehaviour {
             entities.Add(eC);
             id++;
         }
-
-
+        
         currentPlayerIndex = 0;
         currentPlayer = entities[currentPlayerIndex];
         SetCamera();
@@ -57,6 +56,11 @@ public class TurnManager : MonoBehaviour {
     public void Remove(EntityController eC)
     {
         entities.Remove(eC);
+        if(currentPlayer == eC)
+        {
+            SkipAction();
+            SkipAction();
+        }
     }
 
     public void SkipAction()
@@ -79,19 +83,42 @@ public class TurnManager : MonoBehaviour {
     IEnumerator EndTurnActions()
     {
         yield return new WaitForEndOfFrame();
+
+        bool canPlay = true;
+
         if (!gameFinished)
         {
             SpellManager.Instance.ResetSpell();
 
-            currentPlayerIndex = (currentPlayerIndex + 1) % entities.Count;
-
-            currentPlayer = entities[currentPlayerIndex];
-            SetCamera();
-
-            if (currentPlayerIndex == 0)
+            do
             {
-                EndOfGlobalTurn();
-            }
+                canPlay = true;
+
+                currentPlayerIndex = (currentPlayerIndex + 1) % entities.Count;
+
+                currentPlayer = entities[currentPlayerIndex];
+
+                if (currentPlayer.id != currentPlayerIndex)
+                {
+                    currentPlayer.id = currentPlayerIndex;
+                }
+
+                SetCamera();
+
+                if (currentPlayerIndex == 0)
+                {
+                    EndOfGlobalTurn();
+                }
+
+                if (currentPlayer.stunned)
+                {
+                    canPlay = false;
+                    currentPlayer.stunned = false;
+                }
+                
+            } while (!canPlay);
+            
+
         }
     }
 
