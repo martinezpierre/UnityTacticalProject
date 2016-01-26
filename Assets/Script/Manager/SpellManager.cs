@@ -200,16 +200,26 @@ public class SpellManager : MonoBehaviour {
         if (target && target.occupant)
         {
             //effet du sort sur la case target
-            AudioSource.PlayClipAtPoint(SoundManager.Instance.healSound, target.transform.position);
-            target.occupant.TakeDamage(-TurnManager.Instance.currentPlayer.damage);
-
-            TurnManager.Instance.SkipAction();
+            StartCoroutine("letsGoHeal");
         }
         else
         {
             //creation de la zone du sort
             CreateSpellZone(0, false);
         }
+    }
+
+    IEnumerator letsGoHeal()
+    {
+        AudioSource.PlayClipAtPoint(SoundManager.Instance.healSound, target.transform.position);
+        target.occupant.TakeDamage(-TurnManager.Instance.currentPlayer.damage);
+        GameObject instance = Instantiate(Resources.Load("Particles/heal/heal"), TurnManager.Instance.currentPlayer.transform.position, Quaternion.identity) as GameObject;
+        instance.transform.eulerAngles = new Vector3(-90, 0, 0);
+        Destroy(instance, 3f);
+
+        yield return new WaitForSeconds(2f);
+
+        TurnManager.Instance.SkipAction();
     }
 
     void TwoAttacks()
@@ -229,11 +239,9 @@ public class SpellManager : MonoBehaviour {
     {
         if (target && !target.occupant)
         {
-            AudioSource.PlayClipAtPoint(SoundManager.Instance.teleportationSound, target.transform.position);
-            currentPlayer.transform.position = new Vector3(target.transform.position.x, currentPlayer.transform.position.y, target.transform.position.z);
-            currentPlayer.GetComponent<EntityController>().UpdatePosition();
+            StartCoroutine("letsGoElsewhere");
 
-            TurnManager.Instance.SkipAction();
+
         }
         else
         {
@@ -241,14 +249,34 @@ public class SpellManager : MonoBehaviour {
         }
     }
 
+    IEnumerator letsGoElsewhere()
+    {
+
+        AudioSource.PlayClipAtPoint(SoundManager.Instance.teleportationSound, target.transform.position);
+        GameObject instance = Instantiate(Resources.Load("Particles/teleportation"), TurnManager.Instance.currentPlayer.transform.position, Quaternion.identity) as GameObject;
+        instance.transform.eulerAngles = new Vector3(-90, 0, 0);
+        Destroy(instance, 3f);
+
+        yield return new WaitForSeconds(0.5f);
+
+        currentPlayer.transform.position = new Vector3(target.transform.position.x, currentPlayer.transform.position.y, target.transform.position.z);
+        currentPlayer.GetComponent<EntityController>().UpdatePosition();
+
+        GameObject instance2 = Instantiate(Resources.Load("Particles/atterissage"), target.transform.position+Vector3.up, Quaternion.identity) as GameObject;
+        instance2.transform.eulerAngles = new Vector3(-90,0,0);
+
+        Destroy(instance2, 3f);
+
+        yield return new WaitForSeconds(1f);
+        TurnManager.Instance.SkipAction();
+    }
+
+
     void ReductionDamage()
     {
         if (target)
         {
-            AudioSource.PlayClipAtPoint(SoundManager.Instance.reducDamageSound, target.transform.position);
-            currentPlayer.GetComponent<EntityController>().SetDamageReduction(damageReduction, nbTurnDamageReducMax);
-
-            TurnManager.Instance.SkipAction();
+            StartCoroutine("letsGoKFC");
         }
         else
         {
@@ -256,12 +284,24 @@ public class SpellManager : MonoBehaviour {
         }
     }
 
+    IEnumerator letsGoKFC()
+    {
+        AudioSource.PlayClipAtPoint(SoundManager.Instance.reducDamageSound, target.transform.position);
+        currentPlayer.GetComponent<EntityController>().SetDamageReduction(damageReduction, nbTurnDamageReducMax);
+        GameObject instance2 = Instantiate(Resources.Load("Particles/boeuf"), target.transform.position + Vector3.up*3, Quaternion.identity) as GameObject;
+        instance2.transform.eulerAngles = new Vector3(-90, 0, 0);
+
+        Destroy(instance2, 4f);
+
+        yield return new WaitForSeconds(2f);
+        TurnManager.Instance.SkipAction();
+    }
+
     void AtackLongRange()
     {
         if (target && target.occupant)
         {
-            AudioSource.PlayClipAtPoint(SoundManager.Instance.GetLaserSound(), target.transform.position);
-            SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 1);
+            StartCoroutine("ALR");
 
         }
         else
@@ -270,19 +310,43 @@ public class SpellManager : MonoBehaviour {
         }
     }
 
+    IEnumerator ALR()
+    {
+        AudioSource.PlayClipAtPoint(SoundManager.Instance.GetLaserSound(), target.transform.position);
+        GameObject instance2 = Instantiate(Resources.Load("Particles/laser"), target.transform.position + Vector3.up, Quaternion.identity) as GameObject;
+        //instance2.transform.eulerAngles = new Vector3(-90, 0, 0);
+
+        Destroy(instance2, 3f);
+
+        yield return new WaitForSeconds(1f);
+
+        SendDamage(TurnManager.Instance.currentPlayer, target.occupant, 1);
+    }
+
     void CounterAttack()
     {
         if (target)
         {
-            AudioSource.PlayClipAtPoint(SoundManager.Instance.buffSound, target.transform.position);
-            currentPlayer.GetComponent<EntityController>().SetCounter(nbCounterattack, nbTurnCounterMax);
-
-            TurnManager.Instance.SkipAction();
+            StartCoroutine("BOUBOU");
         }
         else
         {
             CreateSpellZone(0, false);
         }
+    }
+
+    IEnumerator BOUBOU()
+    {
+        AudioSource.PlayClipAtPoint(SoundManager.Instance.buffSound, target.transform.position);
+        currentPlayer.GetComponent<EntityController>().SetCounter(nbCounterattack, nbTurnCounterMax);
+        GameObject instance2 = Instantiate(Resources.Load("Particles/bouclier/bouclier"), target.transform.position + Vector3.up, Quaternion.identity) as GameObject;
+       // instance2.GetComponent<Animator>().Play;
+
+        Destroy(instance2, 3f);
+
+        yield return new WaitForSeconds(2f);
+        TurnManager.Instance.SkipAction();
+
     }
 
     void Stun()
@@ -362,7 +426,9 @@ public class SpellManager : MonoBehaviour {
     IEnumerator InvocAnim(Vector3 pos)
     {
         AudioSource.PlayClipAtPoint(SoundManager.Instance.GetInvocSound(), target.transform.position);
-
+        GameObject instance = Instantiate(Resources.Load("Particles/invocation/invocation"),pos,Quaternion.identity) as GameObject;
+        
+        Destroy(instance, 3f);
         GameObject go = Instantiate(InvocationPrefab, pos, Quaternion.identity) as GameObject;
         EntityController eC = go.GetComponent<EntityController>();
         eC.AddSpell(SPELL.ATTACK);
