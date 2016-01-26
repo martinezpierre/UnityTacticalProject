@@ -25,6 +25,8 @@ public class ArenaManager: MonoBehaviour
 	private GameObject papaMur;
     private bool end;
 
+    GameObject[] players;
+
     static ArenaManager instance;
     public static ArenaManager Instance
     {
@@ -33,19 +35,19 @@ public class ArenaManager: MonoBehaviour
             return instance;
         }
     }
-    void Awake ()
+    void Awake()
     {
         end = false;
-		GameObject GrandPa = new GameObject();
+        GameObject GrandPa = new GameObject();
         instance = this;
 
-		GrandPa.name = "GrandPa";
-		papaSol = new GameObject();
-		papaSol.name = "PapaSol";
-		papaSol.transform.parent = GrandPa.transform;
-		papaMur = new GameObject();
-		papaMur.name = "PapaMur";
-		papaMur.transform.parent = GrandPa.transform;
+        GrandPa.name = "GrandPa";
+        papaSol = new GameObject();
+        papaSol.name = "PapaSol";
+        papaSol.transform.parent = GrandPa.transform;
+        papaMur = new GameObject();
+        papaMur.name = "PapaMur";
+        papaMur.transform.parent = GrandPa.transform;
         wallHeight = wall.transform.localScale.y / 2;
         floorSide = floor.transform.localScale.x / 2;
         arena = new GameObject[height, width];
@@ -62,13 +64,13 @@ public class ArenaManager: MonoBehaviour
         }
         for (int i = 0; i < height; i++)
         {
-            for(int j = 0; j < width; j++)
+            for (int j = 0; j < width; j++)
             {
                 // Création du sol de l'arène et envoi dans la fonction de création des murs random
                 WallCreation(i, j);
                 GameObject currentFloor = Instantiate(floor, new Vector3(i, 0, j), Quaternion.identity) as GameObject;
                 CubeScript CS = currentFloor.GetComponent<CubeScript>();
-                CS.tile = new int[] { i,j };
+                CS.tile = new int[] { i, j };
                 listCubeScript.Add(CS);
                 arena[i, j] = currentFloor;
                 currentFloor.transform.parent = papaSol.transform;
@@ -86,7 +88,7 @@ public class ArenaManager: MonoBehaviour
         CheckNeighboors();
 
 
-        while(end == false)
+        while (end == false)
         {
             Colorate();
             Check();
@@ -101,26 +103,42 @@ public class ArenaManager: MonoBehaviour
             }
         }
 
-        GameObject go = Instantiate(player, new Vector3(0,player.transform.localScale.y/2,0), Quaternion.identity) as GameObject;
+        GameObject go = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, 0), Quaternion.identity) as GameObject;
         Camera.main.transform.parent = go.transform;
         Camera.main.transform.localPosition = new Vector3(0, 10, 0);
-        GameObject go2 = Instantiate(player, new Vector3(width-1, player.transform.localScale.y / 2, 0), Quaternion.identity) as GameObject;
+        GameObject go2 = Instantiate(player, new Vector3(width - 1, player.transform.localScale.y / 2, 0), Quaternion.identity) as GameObject;
 
-        GameObject go3 = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, height-1), Quaternion.identity) as GameObject;
+        GameObject go3 = Instantiate(player, new Vector3(0, player.transform.localScale.y / 2, height - 1), Quaternion.identity) as GameObject;
 
         GameObject go4 = Instantiate(player, new Vector3(width - 1, player.transform.localScale.y / 2, height - 1), Quaternion.identity) as GameObject;
 
-        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
-        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TWOATTACKS);
-        go.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+        players = new GameObject[10];
 
-        go2.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
+        players[1] = go;
+        players[2] = go2;
+        players[3] = go3;
+        players[4] = go4;
 
-        go3.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TWOATTACKS);
-        go3.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+    }
 
-        go4.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.HEAL);
-        go4.GetComponent<EntityController>().AddSpell(SpellManager.SPELL.TELEPORTATION);
+    void Start()
+    {
+        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP1)
+        {
+            players[1].GetComponent<EntityController>().AddSpell(spell);
+        }
+        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP2)
+        {
+            players[2].GetComponent<EntityController>().AddSpell(spell);
+        }
+        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP3)
+        {
+            players[3].GetComponent<EntityController>().AddSpell(spell);
+        }
+        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP4)
+        {
+            players[4].GetComponent<EntityController>().AddSpell(spell);
+        }
     }
 
     void CheckNeighboors()

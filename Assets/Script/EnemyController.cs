@@ -11,11 +11,11 @@ public class EnemyController : EntityController {
         canMove = true;
         canAttack = true;
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+
+    // Update is called once per frame
+    protected override void Update () {
+        base.Update();
+    }
 
     public override void BeginTurn()
     {

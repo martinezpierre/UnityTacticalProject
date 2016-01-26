@@ -12,10 +12,11 @@ public class PlayerController : EntityController
 
     Color movColor;
 
+
     protected override void Start()
     {
         base.Start();
-
+        
         canMove = true;
         canAttack = true;
 
@@ -27,14 +28,16 @@ public class PlayerController : EntityController
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+
+        base.Update();
 
         if (!TurnManager.Instance.canPlay(id)) return;
         
         MoveAction();
         AttackAction();
-
+        
     }
 
     public override void SkipAction()
@@ -73,6 +76,8 @@ public class PlayerController : EntityController
                         canMove = false;
                         willMove = false;
                         roadOfTiles = MovementManager.Instance.findPath(transform.position, hit.transform.position);
+
+                        anim.Play("Walk");
 
                         if (roadOfTiles.Count > 0)
                             StartCoroutine(move(roadOfTiles));
@@ -188,6 +193,9 @@ public class PlayerController : EntityController
             {
                 float step = speed * Time.deltaTime;
                 transform.position = Vector3.MoveTowards(transform.position, nextTarget, step);
+
+                transform.LookAt(new Vector3(nextTarget.x,transform.position.y,nextTarget.z));
+
                 yield return 0;
             }
             else if (target.Count != 1)
@@ -202,17 +210,22 @@ public class PlayerController : EntityController
         repaint(tiles);
         roadOfTiles.Clear();
         moovng = false;
+        
+        anim.Stop("Walk");
     }
 
     public override void BeginTurn()
     {
-        Debug.Log("begin player");
+        base.BeginTurn();
         recolor();
     }
 
     public override void TakeDamage(int n)
     {
+
         base.TakeDamage(n);
+        
+
         //Destroy(gameObject);
     }
 
