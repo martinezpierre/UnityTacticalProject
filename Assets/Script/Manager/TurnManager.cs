@@ -57,8 +57,20 @@ public class TurnManager : MonoBehaviour {
         currentPlayerIndex = 0;
         currentPlayer = entities[currentPlayerIndex];
         SetCamera();
+
+        StartCoroutine(InitializeTurns());
     }
     
+    IEnumerator InitializeTurns()
+    {
+        yield return new WaitForEndOfFrame();
+        
+        for(int i = 0;i < (playerIdList.Count-1)*2; i++)
+        {
+            SkipAction();
+        }
+    }
+
     public Color GetColor()
     {
         nbColorAffected++;
@@ -80,6 +92,17 @@ public class TurnManager : MonoBehaviour {
             SkipAction();
             SkipAction();
         }
+
+        if(entities.Count == 1)
+        {
+            EndGame();
+        }
+    }
+
+    void EndGame()
+    {
+        Destroy(UIManager.Instance.gameObject);
+        Application.LoadLevel(0);
     }
 
     public void SkipAction()

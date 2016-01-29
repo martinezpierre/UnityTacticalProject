@@ -107,7 +107,10 @@ public class EntityController : MonoBehaviour {
 
     public virtual void TakeDamage(int n){
 
-        anim.Play("Damage");
+        if (n > 0)
+        {
+            anim.Play("Damage");
+        }
 
         life -= (int)(n * damageReduction);
         
