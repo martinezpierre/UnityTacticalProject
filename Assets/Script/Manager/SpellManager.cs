@@ -16,6 +16,7 @@ public class SpellManager : MonoBehaviour {
 
     void Awake()
     {
+        DontDestroyOnLoad(transform.gameObject);
         instance = this;
     }
 

@@ -38,6 +38,8 @@ public class ArenaManager: MonoBehaviour
     }
     void Awake()
     {
+        DontDestroyOnLoad(transform.gameObject);
+
         end = false;
         GameObject GrandPa = new GameObject();
         instance = this;
@@ -124,21 +126,12 @@ public class ArenaManager: MonoBehaviour
 
     void Start()
     {
-        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP1)
+        for(int i = 1; i <= 4; i++)
         {
-            players[1].GetComponent<EntityController>().AddSpell(spell);
-        }
-        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP2)
-        {
-            players[2].GetComponent<EntityController>().AddSpell(spell);
-        }
-        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP3)
-        {
-            players[3].GetComponent<EntityController>().AddSpell(spell);
-        }
-        foreach (SpellManager.SPELL spell in SpellManager.Instance.spellsP4)
-        {
-            players[4].GetComponent<EntityController>().AddSpell(spell);
+            foreach (SpellManager.SPELL spell in UIManager.Instance.SelectedSpells[i-1])
+            {
+                players[i].GetComponent<EntityController>().AddSpell(spell);
+            }
         }
     }
 

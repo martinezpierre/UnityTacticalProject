@@ -16,6 +16,8 @@ public class TurnManager : MonoBehaviour {
 
     void Awake()
     {
+        DontDestroyOnLoad(transform.gameObject);
+
         instance = this;
 
         playerIdList = new List<int>();

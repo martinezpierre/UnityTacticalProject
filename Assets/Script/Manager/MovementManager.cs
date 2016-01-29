@@ -17,6 +17,7 @@ public class MovementManager : MonoBehaviour
     }
     void Awake()
     {
+        DontDestroyOnLoad(transform.gameObject);
         instance = this;
     }
     protected class DuplicateKeyComparer<TKey> :
